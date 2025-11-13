@@ -1,65 +1,238 @@
-import Image from "next/image";
+import Link from "next/link";
+import { TrendingUp, Users, PieChart, Wallet, Search, Filter, Zap, BarChart3, Lock, Share2 } from "lucide-react";
+import Card from "../components/Card";
+import PageLoadingOverlay from "../components/PageLoadingOverlay";
+import AnimatedStat from "../components/AnimatedStat";
+import HeroSection from "../components/HeroSection";
+import SectionAnimator from "../components/SectionAnimator";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
+      <PageLoadingOverlay />
+      {/* Navigation Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
+              <Wallet className="text-white" size={24} />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Vaultly</h1>
+          </div>
+          <nav className="flex gap-6 items-center">
+            <Link href="/login" className="text-gray-600 hover:text-blue-600 font-medium transition duration-300">
+              Login
+            </Link>
+            <Link href="/dashboard" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+              Dashboard
+            </Link>
+          </nav>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* Features Section */}
+      <section id="features" className="bg-white py-16 sm:py-24">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Core Features
+            </h3>
+            <p className="text-lg text-gray-600">
+              Everything you need for collaborative personal and group finance management
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 overflow-hidden">
+            <Card
+              icon={<Wallet className="text-blue-600" size={32} />}
+              title="Smart Expense Tracking"
+              description="Add, categorize, and manage expenses with real-time summaries"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Card
+              icon={<Search className="text-blue-500" size={32} />}
+              title="Advanced Search"
+              description="Quickly find expenses by description, amount, or category"
+            />
+            <Card
+              icon={<Filter className="text-amber-600" size={32} />}
+              title="Flexible Filtering"
+              description="Filter by date range, category, group, or goal status"
+            />
+            <Card
+              icon={<TrendingUp className="text-emerald-600" size={32} />}
+              title="Sorting & Pagination"
+              description="Sort by amount, date, or name with efficient page navigation"
+            />
+            <Card
+              icon={<Users className="text-purple-600" size={32} />}
+              title="Group Goals"
+              description="Create shared savings goals and track contributions together"
+            />
+            <Card
+              icon={<BarChart3 className="text-indigo-600" size={32} />}
+              title="Analytics & Reports"
+              description="Interactive charts, spending trends, and exportable reports"
+            />
+          </div>
+        </SectionAnimator>
+      </section>
+
+      {/* How It Works */}
+      <section className="bg-linear-to-br from-blue-50 to-emerald-50 py-16 sm:py-24">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-16">
+            Three Simple Steps
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 overflow-hidden">
+            <Card
+              number="1"
+              title="Sign Up & Authenticate"
+              description="Create your account with secure JWT-based authentication and role-based access"
+              variant="step"
+            />
+            <Card
+              number="2"
+              title="Track & Collaborate"
+              description="Add expenses, create groups, invite members, and search/filter/sort data effortlessly"
+              variant="step"
+            />
+            <Card
+              number="3"
+              title="Analyze & Export"
+              description="View insights with interactive charts and export reports as PDF or CSV"
+              variant="step"
+            />
+          </div>
+        </SectionAnimator>
+      </section>
+
+      {/* Data Management Section */}
+      <section className="bg-white py-16 sm:py-24">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">
+            Advanced Data Management
+          </h3>
+          <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+            Vaultly provides enterprise-grade data retrieval with search, sort, filter, and pagination capabilities
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-hidden">
+            <Card
+              icon={<Search size={24} className="text-blue-600" />}
+              title="Search"
+              description="Find expenses by name, description, or amount instantly"
+              variant="data"
+            />
+            <Card
+              icon={<TrendingUp size={24} className="text-emerald-600" />}
+              title="Sort"
+              description="Sort by date, amount, category, or name in ascending/descending order"
+              variant="data"
+            />
+            <Card
+              icon={<Filter size={24} className="text-amber-600" />}
+              title="Filter"
+              description="Multi-filter support: category, date range, group, status"
+              variant="data"
+            />
+            <Card
+              icon={<BarChart3 size={24} className="text-indigo-600" />}
+              title="Paginate"
+              description="Efficient data loading with customizable page size and navigation"
+              variant="data"
+            />
+          </div>
+        </SectionAnimator>
+      </section>
+
+      {/* Stats Section */}
+      <section className="bg-linear-to-r from-blue-50 via-emerald-50 to-blue-50 py-16 sm:py-24">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-16">
+            Trusted by Growing Teams
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+            <AnimatedStat number={500} label="Active Users" suffix="+" />
+            <AnimatedStat number={50} label="Teams Using Vaultly" suffix="K+" />
+            <AnimatedStat number={99} label="Uptime Guarantee" suffix="%" />
+          </div>
+        </SectionAnimator>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-linear-to-r from-blue-600 to-emerald-600 py-16 sm:py-20">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8 text-center" animationType="slideUp">
+          <h3 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            Ready for Transparent Financial Collaboration?
+          </h3>
+          <p className="text-lg text-blue-100 mb-8">
+            Join families, roommates, and friend groups managing finances together with confidence
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/signup" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition duration-300 inline-block">
+              Sign Up for Free
+            </Link>
+            <Link href="/login" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 inline-block">
+              Already Have an Account?
+            </Link>
+          </div>
+        </SectionAnimator>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-12">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-8">
+            <div className="md:w-1/3">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
+                  <Wallet className="text-white" size={20} />
+                </div>
+                <h4 className="text-white font-semibold">Vaultly</h4>
+              </div>
+              <p className="text-sm">Collaborative personal and group finance tracker with advanced search, filter, sort, and pagination.</p>
+            </div>
+            <div className="flex gap-16 md:w-2/3 justify-end">
+              <div>
+                <h4 className="text-white font-semibold mb-4">Features</h4>
+                <ul className="text-sm space-y-2">
+                  <li><Link href="#features" className="hover:text-white transition">Expense Tracking</Link></li>
+                  <li><Link href="#features" className="hover:text-white transition">Group Goals</Link></li>
+                  <li><Link href="#features" className="hover:text-white transition">Analytics</Link></li>
+                  <li><Link href="#features" className="hover:text-white transition">Reports</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Security</h4>
+                <ul className="text-sm space-y-2">
+                  <li><Link href="#" className="hover:text-white transition">JWT Authentication</Link></li>
+                  <li><Link href="#" className="hover:text-white transition">Role-Based Access</Link></li>
+                  <li><Link href="#" className="hover:text-white transition">Data Privacy</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold mb-4">Resources</h4>
+                <ul className="text-sm space-y-2">
+                  <li><Link href="#" className="hover:text-white transition">Documentation</Link></li>
+                  <li><Link href="#" className="hover:text-white transition">API Reference</Link></li>
+                  <li><Link href="#" className="hover:text-white transition">Support</Link></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-sm">© {new Date().getFullYear()} Vaultly. All rights reserved.</p>
+            <div className="flex gap-4 mt-4 sm:mt-0">
+              <Link href="#" className="text-gray-400 hover:text-white transition text-sm">Privacy Policy</Link>
+              <Link href="#" className="text-gray-400 hover:text-white transition text-sm">Terms of Service</Link>
+            </div>
+          </div>
         </div>
-      </main>
+      </footer>
     </div>
   );
 }
