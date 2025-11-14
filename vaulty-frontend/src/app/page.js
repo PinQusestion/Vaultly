@@ -9,7 +9,7 @@ import SectionAnimator from "../components/SectionAnimator";
 export default function Home() {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
-      <PageLoadingOverlay />
+      {/* <PageLoadingOverlay /> */}
       {/* Navigation Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -35,7 +35,7 @@ export default function Home() {
 
       {/* Features Section */}
       <section id="features" className="bg-white py-16 sm:py-24">
-        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8" staggerChildren={true}>
           <div className="text-center mb-16">
             <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Core Features
@@ -82,7 +82,7 @@ export default function Home() {
 
       {/* How It Works */}
       <section className="bg-linear-to-br from-blue-50 to-emerald-50 py-16 sm:py-24">
-        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8" staggerChildren={true}>
           <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-16">
             Three Simple Steps
           </h3>
@@ -112,7 +112,7 @@ export default function Home() {
 
       {/* Data Management Section */}
       <section className="bg-white py-16 sm:py-24">
-        <SectionAnimator className="px-4 sm:px-6 lg:px-8">
+        <SectionAnimator className="px-4 sm:px-6 lg:px-8" staggerChildren={true}>
           <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">
             Advanced Data Management
           </h3>
@@ -173,10 +173,10 @@ export default function Home() {
             Join families, roommates, and friend groups managing finances together with confidence
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/signup" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition duration-300 inline-block">
+            <Link href="/signup" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition duration-300 inline-block">
               Sign Up for Free
             </Link>
-            <Link href="/login" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 inline-block">
+            <Link href="/login" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 hover:scale-105 transition duration-300 inline-block">
               Already Have an Account?
             </Link>
           </div>

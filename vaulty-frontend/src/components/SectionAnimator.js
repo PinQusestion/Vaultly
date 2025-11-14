@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function SectionAnimator({ children, className = '', animationType = 'fadeIn' }) {
+export default function SectionAnimator({ children, className = '', animationType = 'fadeIn', staggerChildren = false }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -29,15 +29,34 @@ export default function SectionAnimator({ children, className = '', animationTyp
 
     const animation = animations[animationType] || animations.fadeIn;
 
-    gsap.fromTo(ref.current, animation.from, {
-      ...animation.to,
-      scrollTrigger: {
-        trigger: ref.current,
-        start: 'top 80%',
-        toggleActions: 'play none none none',
-        once: true,
-      },
-    });
+    // Stagger children if enabled
+    if (staggerChildren) {
+      const children = ref.current.querySelectorAll('[data-animate]');
+      gsap.fromTo(
+        children,
+        animation.from,
+        {
+          ...animation.to,
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: ref.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+            once: true,
+          },
+        }
+      );
+    } else {
+      gsap.fromTo(ref.current, animation.from, {
+        ...animation.to,
+        scrollTrigger: {
+          trigger: ref.current,
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+          once: true,
+        },
+      });
+    }
 
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => {
@@ -46,7 +65,7 @@ export default function SectionAnimator({ children, className = '', animationTyp
         }
       });
     };
-  }, [animationType]);
+  }, [animationType, staggerChildren]);
 
   return (
     <div ref={ref} className={className}>
@@ -54,3 +73,4 @@ export default function SectionAnimator({ children, className = '', animationTyp
     </div>
   );
 }
+

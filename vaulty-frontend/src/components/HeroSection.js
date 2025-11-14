@@ -12,36 +12,53 @@ export default function HeroSection() {
   const dashboardRef = useRef(null);
 
   useEffect(() => {
+    if (!titleRef.current || !descRef.current || !buttonsRef.current || !dashboardRef.current) return;
+
     const tl = gsap.timeline();
 
+    // Smooth title fade-in
     tl.fromTo(
       titleRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', immediateRender: true },
       0
     )
+      // Description slides in
       .fromTo(
         descRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 1, ease: 'power2.out', immediateRender: true },
         0.2
       )
+      // Buttons cascade in
       .fromTo(
-        buttonsRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-        0.4
+        buttonsRef.current.children,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: 'power3.out', immediateRender: true },
+        0.5
       )
+      // Dashboard card smooth entrance
       .fromTo(
         dashboardRef.current,
-        { opacity: 0, scale: 0.8, rotateY: -20 },
-        { opacity: 1, scale: 1, rotateY: 0, duration: 1, ease: 'back.out(1.7)' },
-        0.3
+        { opacity: 0, scale: 0.9, y: 40 },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          y: 0,
+          duration: 1.1, 
+          ease: 'power2.out', 
+          immediateRender: true 
+        },
+        0.4
       );
+
+    return () => {
+      tl.kill();
+    };
   }, []);
 
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <section className="px-4 sm:px-6 lg:px-8 py-16 sm:py-24" style={{ perspective: '1000px' }}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
           <h2 ref={titleRef} className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
@@ -51,33 +68,38 @@ export default function HeroSection() {
             Vaultly is your collaborative finance tracker for personal expense management and shared group goals. Track expenses with advanced search, sorting, filtering, and pagination. Ensure financial transparency and accountability with friends, family, and roommates.
           </p>
           <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4">
-            <Link href="/signup" className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition duration-300 text-center">
+            <Link href="/signup" className="bg-linear-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition duration-300 text-center">
               Get Started Free
             </Link>
-            <Link href="#features" className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition duration-300 text-center">
+            <Link href="#features" className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 hover:scale-105 transition duration-300 text-center">
               Learn More
             </Link>
           </div>
         </div>
 
-        <div ref={dashboardRef} className="relative perspective">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-4 hover:shadow-2xl transition">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-gray-600">Monthly Balance</span>
-              <TrendingUp className="text-emerald-600" size={20} />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">$4,256.50</div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full w-3/4 bg-linear-to-r from-blue-600 to-emerald-600"></div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="bg-blue-50 rounded-lg p-4 hover:scale-105 transition duration-300">
-                <p className="text-xs text-gray-600 font-medium">Personal</p>
-                <p className="text-lg font-bold text-blue-600">$2,100</p>
+        <div ref={dashboardRef} className="relative" style={{ transformStyle: 'preserve-3d' }}>
+          <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-4 hover:shadow-2xl transition group relative overflow-hidden">
+            {/* Animated gradient background on hover */}
+            <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            <div className="relative z-10">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-semibold text-gray-600">Monthly Balance</span>
+                <TrendingUp className="text-emerald-600 group-hover:animate-pulse" size={20} />
               </div>
-              <div className="bg-emerald-50 rounded-lg p-4 hover:scale-105 transition duration-300">
-                <p className="text-xs text-gray-600 font-medium">Shared Groups</p>
-                <p className="text-lg font-bold text-emerald-600">$2,156.50</p>
+              <div className="text-3xl font-bold text-gray-900">$4,256.50</div>
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full w-3/4 bg-linear-to-r from-blue-600 to-emerald-600 group-hover:w-full transition-all duration-700"></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="bg-blue-50 rounded-lg p-4 hover:scale-110 transition duration-300 cursor-pointer transform hover:rotate-1">
+                  <p className="text-xs text-gray-600 font-medium">Personal</p>
+                  <p className="text-lg font-bold text-blue-600">$2,100</p>
+                </div>
+                <div className="bg-emerald-50 rounded-lg p-4 hover:scale-110 transition duration-300 cursor-pointer transform hover:-rotate-1">
+                  <p className="text-xs text-gray-600 font-medium">Shared Groups</p>
+                  <p className="text-lg font-bold text-emerald-600">$2,156.50</p>
+                </div>
               </div>
             </div>
           </div>
