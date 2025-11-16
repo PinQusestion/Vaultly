@@ -20,8 +20,8 @@ export default function FormInput({
         value={value}
         onChange={onChange}
         required={required}
-        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition ${
-          error ? 'border-red-500' : 'border-gray-300'
+        className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition text-gray-900 placeholder:text-gray-400 bg-white ${
+          error ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'
         }`}
       />
       {error && <p className="text-sm text-red-600">{error}</p>}

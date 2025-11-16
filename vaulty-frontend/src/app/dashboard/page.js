@@ -38,6 +38,13 @@ function Sidebar() {
       </nav>
 
       <div className="border-t border-gray-200 mt-6 pt-6">
+        <p className="text-xs text-gray-500 font-medium mb-3">Account</p>
+        <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition text-sm">
+          ← Back to Home
+        </Link>
+      </div>
+
+      <div className="border-t border-gray-200 mt-6 pt-6">
         <p className="text-xs text-gray-500 font-medium mb-3">Quick Stats</p>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between items-center">
@@ -190,15 +197,25 @@ export default function DashboardPage() {
       {/* Top Bar */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+              <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
+                <Wallet className="text-white" size={20} />
+              </div>
+              <h1 className="text-xl font-bold text-gray-900">Vaultly</h1>
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
               <Search size={20} className="text-gray-600" />
             </button>
-            <button className="px-4 py-2 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition">
-              <Plus size={18} className="inline mr-2" />
+            <button className="px-4 py-2 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2">
+              <Plus size={18} />
               Add Expense
             </button>
+            <Link href="/" className="px-3 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium hover:bg-gray-100 rounded-lg transition">
+              Home
+            </Link>
           </div>
         </div>
       </div>
