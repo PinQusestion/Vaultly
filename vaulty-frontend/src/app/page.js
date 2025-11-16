@@ -1,3 +1,5 @@
+'use client';
+
 import Link from "next/link";
 import { TrendingUp, Users, Wallet, Search, Filter, BarChart3 } from "lucide-react";
 import Card from "../components/home/Card";
