@@ -1,11 +1,11 @@
 'use client';
 
-import useCountUp from '../hooks/useCountUp';
-import useGsapAnimation from '../hooks/useGsapAnimation';
+import useCountUp from '../../hooks/useCountUp';
+import useGsapAnimation from '../../hooks/useGsapAnimation';
 
 export default function AnimatedStat({ number, label, suffix = '' }) {
   const containerRef = useGsapAnimation('fadeInUp', {
-    scrollTrigger: { start: 'top 80%' },
+    scrollTrigger: { start: 'top 90%' },
   });
   const numberRef = useCountUp(number, 2.5);
 

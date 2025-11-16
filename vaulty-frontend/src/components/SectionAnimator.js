@@ -15,15 +15,15 @@ export default function SectionAnimator({ children, className = '', animationTyp
     const animations = {
       fadeIn: {
         from: { opacity: 0 },
-        to: { opacity: 1, duration: 0.6, ease: 'power2.out' },
+        to: { opacity: 1, duration: 0.7, ease: 'power1.inOut' },
       },
       slideUp: {
-        from: { opacity: 0, y: 50 },
-        to: { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+        from: { opacity: 0, y: 40 },
+        to: { opacity: 1, y: 0, duration: 0.9, ease: 'power2.inOut' },
       },
       slideInLeft: {
-        from: { opacity: 0, x: -80 },
-        to: { opacity: 1, x: 0, duration: 0.8, ease: 'power3.out' },
+        from: { opacity: 0, x: -60 },
+        to: { opacity: 1, x: 0, duration: 0.9, ease: 'power2.inOut' },
       },
     };
 
@@ -37,13 +37,16 @@ export default function SectionAnimator({ children, className = '', animationTyp
         animation.from,
         {
           ...animation.to,
-          stagger: 0.15,
+          stagger: 0.12,
           scrollTrigger: {
             trigger: ref.current,
-            start: 'top 80%',
+            start: 'top 95%',
+            end: 'top 60%',
             toggleActions: 'play none none none',
             once: true,
+            markers: false,
           },
+          immediateRender: false,
         }
       );
     } else {
@@ -51,10 +54,13 @@ export default function SectionAnimator({ children, className = '', animationTyp
         ...animation.to,
         scrollTrigger: {
           trigger: ref.current,
-          start: 'top 80%',
+          start: 'top 95%',
+          end: 'top 60%',
           toggleActions: 'play none none none',
           once: true,
+          markers: false,
         },
+        immediateRender: false,
       });
     }
 

@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { TrendingUp, Users, PieChart, Wallet, Search, Filter, Zap, BarChart3, Lock, Share2 } from "lucide-react";
-import Card from "../components/Card";
-import PageLoadingOverlay from "../components/PageLoadingOverlay";
-import AnimatedStat from "../components/AnimatedStat";
-import HeroSection from "../components/HeroSection";
+import { TrendingUp, Users, Wallet, Search, Filter, BarChart3 } from "lucide-react";
+import Card from "../components/home/Card";
+import AnimatedStat from "../components/home/AnimatedStat";
+import HeroSection from "../components/home/HeroSection";
 import SectionAnimator from "../components/SectionAnimator";
 
 export default function Home() {
