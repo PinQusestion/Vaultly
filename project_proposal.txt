@@ -1,0 +1,203 @@
+1. Project Title
+Vaultly – Personal & Group Finance Tracker
+
+2. Problem Statement
+Managing expenses and shared savings is often chaotic. Families, roommates, and friends struggle to track individual contributions, monitor collective goals, and gain insights into spending patterns.
+Vaultly provides a collaborative platform for personal expense tracking and group goal management — with enhanced tools for searching, sorting, filtering, and paginating financial data — ensuring financial transparency, efficiency, and accountability.
+
+3. System Architecture
+Frontend → Backend (API) → Database
+Frontend: React.js + Next.js for a modern, responsive UI with dynamic data tables supporting search, sort, and filter features.
+
+
+Backend: Node.js + Express.js REST API handling all CRUD + advanced query functionalities (search, sort, filter, paginate).
+
+
+Database: MySQL / PostgreSQL – relational and optimized for query-based filtering and pagination (via LIMIT, OFFSET, and ORDER BY).
+
+
+Authentication: JWT-based login/signup with role-based access.
+
+
+Hosting:
+
+
+Frontend → Vercel / Netlify
+
+
+Backend → Render / Railway
+
+
+
+
+4. Key Features
+Category
+Features
+Authentication & Authorization
+User registration, login, logout, JWT-based auth, role-based access (leader/member/admin).
+CRUD Operations
+Manage expenses, categories, groups, members, and goals (create/read/update/delete).
+Data Management Enhancements
+Searching, sorting, filtering, and pagination added for efficient data retrieval across expenses, goals, and group members.
+Frontend Routing
+Pages: Home, Login, Dashboard, Expense Manager, Group Goals, Reports, Profile.
+Group Goals
+Create shared goals, track contributions, set deadlines, get alerts.
+Expense Management
+Add/edit/delete expenses, categorize spending, view summaries, filter by date/category, search by description, sort by amount/date.
+Analytics & Reports
+Interactive charts for spending trends (personal + group), exportable reports (PDF/CSV), with search and filter support.
+Notifications
+Alerts for overspending or upcoming deadlines (email/optional push).
+Hosting
+Deploy both backend and frontend to accessible URLs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5. New Feature Integration Details
+🔍 Searching
+Frontend: Search bars for expenses, goals, and members.
+
+
+Backend: Query parameters like ?search=groceries to search by name/description.
+
+
+Database: LIKE queries for flexible text search.
+
+
+🔃 Sorting
+Frontend: Sort dropdowns (e.g., sort by amount, date, or name).
+
+
+Backend: Query params like ?sortBy=date&order=desc.
+
+
+Database: ORDER BY implementation.
+
+
+⚙️ Filtering
+Frontend: Filter by category, date range, group, or goal status.
+
+
+Backend: Multi-filter query support, e.g.,
+ /api/expenses?category=food&startDate=2025-01-01&endDate=2025-01-31.
+
+
+Database: WHERE conditions for flexible filtering.
+
+
+📄 Pagination
+Frontend: Paginated tables with “Next / Previous” controls.
+
+
+Backend: Query params like ?page=2&limit=10.
+
+
+Database: Uses LIMIT and OFFSET for scalable data loading.
+
+
+
+
+6. Tech Stack
+Layer
+Technology
+Frontend
+React.js, Next.js, Axios, TailwindCSS
+Backend
+Node.js, Express.js
+Database
+MySQL / PostgreSQL
+Authentication
+JWT (secure login + role-based authorization)
+Hosting
+Vercel, Render, Netlify, Railway
+
+
+
+
+
+
+
+
+
+
+
+
+7. API Overview (Enhanced)
+Auth Routes
+POST /api/auth/register → Register user
+
+
+POST /api/auth/login → Login & return JWT
+
+
+POST /api/auth/logout → Logout
+
+
+User Routes
+GET /api/users/:id → Fetch user profile
+
+
+PUT /api/users/:id → Update profile
+
+
+Expense Routes
+GET /api/expenses → Fetch user expenses (with search, sort, filter, pagination)
+ Example: /api/expenses?search=rent&sortBy=amount&order=desc&page=2&limit=10
+
+
+POST /api/expenses → Add expense
+
+
+PUT /api/expenses/:id → Update expense
+
+
+DELETE /api/expenses/:id → Delete expense
+
+
+Group Routes
+POST /api/groups → Create group
+
+
+GET /api/groups/:id → Fetch group details
+
+
+POST /api/groups/:id/members → Add member
+
+
+DELETE /api/groups/:id/members/:uid → Remove member
+
+
+Goal Routes
+POST /api/goals → Create goal
+
+
+GET /api/goals → List goals (search, sort, filter, paginate)
+
+
+GET /api/goals/:id → Fetch goal details
+
+
+PUT /api/goals/:id → Update goal progress
+
+
+DELETE /api/goals/:id → Delete goal
+
+
+Reports Routes
+GET /api/reports/summary → Get personal + group expense summary
+
+
+GET /api/reports/export → Export report (CSV/PDF, supports filtered data

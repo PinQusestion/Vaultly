@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id            String         @id @default(uuid())
+  full_name     String
+  email         String         @unique
+  password_hash String
+  role          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  groups        Groups[]
+  groupMembers  GroupMembers[]
+}
+
+model Groups {
+  id                String         @id @default(uuid())
+  name              String
+  createdBy         String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  // CreatedBy relation to users
+  createdByRealtion Users          @relation(fields: [createdBy], references: [id])
+  groupMembers      GroupMembers[]
+}
+
+model GroupMembers {
+  id       String   @id @default(uuid())
+  groupId  String
+  userId   String
+  role     String
+  joinedAt DateTime @default(now())
+
+  group Groups @relation(fields: [groupId], references: [id])
+  user  Users  @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model Categories {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model Expenses {
+  id         String     @id @default(uuid())
+  user_id   String
+  group_id  String
+  categoryId  String
+  amount      Float
+  description String
+  date        DateTime
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  category    Categories @relation(fields: [categoryId], references: [id])
+  user        Users      @relation(fields: [user_id], references: [id])
+  group      Groups      @relation(fields: [group_id], references: [id])
+}
