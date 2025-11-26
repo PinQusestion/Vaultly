@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client"
+  output   = "../src/generated"
 }
 
 datasource db {
@@ -8,26 +9,29 @@ datasource db {
 }
 
 model Users {
-  id            String         @id @default(uuid())
+  id            String   @id @default(uuid())
   full_name     String
-  email         String         @unique
+  email         String   @unique
   password_hash String
   role          String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  groups        Groups[]
-  groupMembers  GroupMembers[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  groups       Groups[]
+  groupMembers GroupMembers[]
+  expenses     Expenses[]
 }
 
 model Groups {
-  id                String         @id @default(uuid())
-  name              String
-  createdBy         String
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  // CreatedBy relation to users
+  id        String   @id @default(uuid())
+  name      String
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   createdByRealtion Users          @relation(fields: [createdBy], references: [id])
   groupMembers      GroupMembers[]
+  expenses          Expenses[]
 }
 
 model GroupMembers {
@@ -44,23 +48,24 @@ model GroupMembers {
 }
 
 model Categories {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
+  expenses  Expenses[]
 }
 
 model Expenses {
-  id         String     @id @default(uuid())
-  user_id   String
-  group_id  String
+  id          String   @id @default(uuid())
+  user_id     String
+  group_id    String
   categoryId  String
   amount      Float
   description String
   date        DateTime
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  category    Categories @relation(fields: [categoryId], references: [id])
-  user        Users      @relation(fields: [user_id], references: [id])
-  group      Groups      @relation(fields: [group_id], references: [id])
+  category Categories @relation(fields: [categoryId], references: [id])
+  user     Users      @relation(fields: [user_id], references: [id])
+  group    Groups     @relation(fields: [group_id], references: [id])
 }
