@@ -12,7 +12,7 @@ model Users {
   id            String   @id @default(uuid())
   full_name     String
   email         String   @unique
-  password_hash String
+  passwordHash String
   role          String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -56,8 +56,8 @@ model Categories {
 
 model Expenses {
   id          String   @id @default(uuid())
-  user_id     String
-  group_id    String
+  userId     String
+  groupId   String
   categoryId  String
   amount      Float
   description String
@@ -66,6 +66,6 @@ model Expenses {
   updatedAt   DateTime @updatedAt
 
   category Categories @relation(fields: [categoryId], references: [id])
-  user     Users      @relation(fields: [user_id], references: [id])
-  group    Groups     @relation(fields: [group_id], references: [id])
+  user     Users      @relation(fields: [userId], references: [id])
+  group    Groups     @relation(fields: [groupId], references: [id])
 }
