@@ -24,7 +24,7 @@ async function signup(userData) {
         headers: {
             "Content-Type": "application/json"
         },
-        credentials: 'include', // Add this
+        credentials: 'include',
         body: JSON.stringify(userData)
     });
     

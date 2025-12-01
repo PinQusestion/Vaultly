@@ -3,25 +3,25 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Categories {
-  id        String     @id
+  id        String     @id @default(uuid())
   name      String
   createdAt DateTime   @default(now())
   Expenses  Expenses[]
 }
 
 model Expenses {
-  id          String     @id
+  id          String     @id @default(uuid())
   categoryId  String
   amount      Float
   description String
   date        DateTime
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime   @updatedAt
   groupId     String
   userId      String
   Categories  Categories @relation(fields: [categoryId], references: [id])
@@ -30,7 +30,7 @@ model Expenses {
 }
 
 model GroupMembers {
-  id       String   @id
+  id       String   @id @default(uuid())
   groupId  String
   userId   String
   role     String
@@ -42,23 +42,23 @@ model GroupMembers {
 }
 
 model Groups {
-  id           String         @id
+  id           String         @id @default(uuid())
   name         String
   createdBy    String
   createdAt    DateTime       @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime       @updatedAt
   Expenses     Expenses[]
   GroupMembers GroupMembers[]
   Users        Users          @relation(fields: [createdBy], references: [id])
 }
 
 model Users {
-  id           String         @id
+  id           String         @id @default(uuid())
   full_name    String
   email        String         @unique
-  role         String
+  role         String         @default("user")
   createdAt    DateTime       @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime       @updatedAt
   passwordHash String
   Expenses     Expenses[]
   GroupMembers GroupMembers[]
