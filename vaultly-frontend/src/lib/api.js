@@ -6,7 +6,7 @@ async function login(email, password) {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include', // Add this
+        credentials: 'include',
         body: JSON.stringify({ email, password })
     });
     
@@ -37,4 +37,34 @@ async function signup(userData) {
     return data;
 }
 
-export { login, signup };
+async function logout() {
+    const response = await fetch(`${API}/auth/logout`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        return { error: error.message || 'Logout failed' };
+    }
+    
+    return response.json();
+}
+
+async function getCurrentUser() {
+    const response = await fetch(`${API}/auth/me`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+    
+    if (!response.ok) {
+        return { error: 'Not authenticated' };
+    }
+    
+    return response.json();
+}
+
+export { login, signup, logout, getCurrentUser };
