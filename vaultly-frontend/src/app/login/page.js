@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Wallet, Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/FormInput';
+import { login } from '../../lib/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -28,11 +29,18 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      // TODO: Connect to backend API
-      console.log('Login attempt:', { email, password });
-      // Example: const response = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+      // Api call for login
+      const loginResponse = await login(email, password);
+      if (loginResponse.error) {
+        setErrors({ submit: loginResponse.error });
+        setLoading(false);
+        return;
+      }
+      // Redirect User to Dashboard
+      window.location.href = '/dashboard';
     } catch (err) {
       setErrors({ submit: 'Login failed. Please try again.' });
+      setLoading(false);
     } finally {
       setLoading(false);
     }

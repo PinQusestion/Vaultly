@@ -1,70 +1,66 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-}
-
-model Users {
-  id            String   @id @default(uuid())
-  full_name     String
-  email         String   @unique
-  passwordHash String
-  role          String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  groups       Groups[]
-  groupMembers GroupMembers[]
-  expenses     Expenses[]
-}
-
-model Groups {
-  id        String   @id @default(uuid())
-  name      String
-  createdBy String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdByRealtion Users          @relation(fields: [createdBy], references: [id])
-  groupMembers      GroupMembers[]
-  expenses          Expenses[]
-}
-
-model GroupMembers {
-  id       String   @id @default(uuid())
-  groupId  String
-  userId   String
-  role     String
-  joinedAt DateTime @default(now())
-
-  group Groups @relation(fields: [groupId], references: [id])
-  user  Users  @relation(fields: [userId], references: [id])
-
-  @@unique([groupId, userId])
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
 
 model Categories {
-  id        String     @id @default(uuid())
+  id        String     @id
   name      String
   createdAt DateTime   @default(now())
-  expenses  Expenses[]
+  Expenses  Expenses[]
 }
 
 model Expenses {
-  id          String   @id @default(uuid())
-  userId     String
-  groupId   String
+  id          String     @id
   categoryId  String
   amount      Float
   description String
   date        DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  groupId     String
+  userId      String
+  Categories  Categories @relation(fields: [categoryId], references: [id])
+  Groups      Groups     @relation(fields: [groupId], references: [id])
+  Users       Users      @relation(fields: [userId], references: [id])
+}
 
-  category Categories @relation(fields: [categoryId], references: [id])
-  user     Users      @relation(fields: [userId], references: [id])
-  group    Groups     @relation(fields: [groupId], references: [id])
+model GroupMembers {
+  id       String   @id
+  groupId  String
+  userId   String
+  role     String
+  joinedAt DateTime @default(now())
+  Groups   Groups   @relation(fields: [groupId], references: [id])
+  Users    Users    @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model Groups {
+  id           String         @id
+  name         String
+  createdBy    String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  Expenses     Expenses[]
+  GroupMembers GroupMembers[]
+  Users        Users          @relation(fields: [createdBy], references: [id])
+}
+
+model Users {
+  id           String         @id
+  full_name    String
+  email        String         @unique
+  role         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  passwordHash String
+  Expenses     Expenses[]
+  GroupMembers GroupMembers[]
+  Groups       Groups[]
 }

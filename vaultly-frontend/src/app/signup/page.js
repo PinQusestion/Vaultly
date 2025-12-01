@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Wallet, Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/FormInput';
+import { signup, login} from '../../lib/api';
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('');
@@ -40,9 +41,31 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      // TODO: Connect to backend API
-      console.log('Signup attempt:', { firstName, lastName, email, password });
-      // Example: const response = await fetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ firstName, lastName, email, password }) });
+      // Api call to signup
+      const userData = {
+        full_name: `${firstName} ${lastName}`, // Change this
+        email,
+        password
+      }
+      
+      // Signup the user
+      const signupResponse = await signup(userData);
+      if (signupResponse.error) {
+        setErrors({ submit: signupResponse.error });
+        setLoading(false);
+        return;
+      }
+
+      // Automatically log in the user after successful signup
+      const loginResponse = await login(email, password);
+      if (loginResponse.error) {
+        setErrors({ submit: loginResponse.error });
+        setLoading(false);
+        return;
+      }
+      
+      console.log('User logged in:', loginResponse.user);
+      window.location.href = '/dashboard';
     } catch (err) {
       setErrors({ submit: 'Signup failed. Please try again.' });
     } finally {

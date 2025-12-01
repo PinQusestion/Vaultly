@@ -39,3 +39,5 @@ coverage/
 # yarn.lock
 
 /src/generated
+
+/generated/prisma
