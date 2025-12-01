@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require("./routes/auth.Routes");
 const cors = require("cors");
 
 const app = express();
@@ -14,14 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRoutes);
-
-app.get("/", (req, res) => {
-    res.send("Welcome to Vaultly!");
-});
-
-app.get("/dashboard", (req, res) => {
-    res.send("This is the dashboard.");
-});
+app.use("/expenses", require("./routes/expense.Routes"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

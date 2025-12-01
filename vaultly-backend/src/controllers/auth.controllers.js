@@ -1,4 +1,4 @@
-const authService = require('../services/authService');
+const authService = require('../services/auth.service');
 
 function safeUser(user){
     if(!user) return null;

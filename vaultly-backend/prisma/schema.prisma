@@ -7,6 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Users {
+  id           String         @id @default(uuid())
+  full_name    String
+  email        String         @unique
+  role         String         @default("user")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  passwordHash String
+
+  // Relations
+  Expenses     Expenses[]
+  GroupMembers GroupMembers[]
+  Groups       Groups[]
+}
+
+model Groups {
+  id           String         @id @default(uuid())
+  name         String
+  createdBy    String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Relations
+  Expenses     Expenses[]
+  GroupMembers GroupMembers[]
+  Users        Users          @relation(fields: [createdBy], references: [id])
+}
+
 model Categories {
   id        String     @id @default(uuid())
   name      String
@@ -16,16 +44,18 @@ model Categories {
 
 model Expenses {
   id          String     @id @default(uuid())
+  userId      String
+  groupId     String?
   categoryId  String
   amount      Float
   description String
   date        DateTime
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  groupId     String
-  userId      String
+  
+  // Relations
   Categories  Categories @relation(fields: [categoryId], references: [id])
-  Groups      Groups     @relation(fields: [groupId], references: [id])
+  Groups      Groups?     @relation(fields: [groupId], references: [id])
   Users       Users      @relation(fields: [userId], references: [id])
 }
 
@@ -35,32 +65,13 @@ model GroupMembers {
   userId   String
   role     String
   joinedAt DateTime @default(now())
+
+  // Relations
   Groups   Groups   @relation(fields: [groupId], references: [id])
   Users    Users    @relation(fields: [userId], references: [id])
 
+
+  // Constraints
   @@unique([groupId, userId])
 }
 
-model Groups {
-  id           String         @id @default(uuid())
-  name         String
-  createdBy    String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  Expenses     Expenses[]
-  GroupMembers GroupMembers[]
-  Users        Users          @relation(fields: [createdBy], references: [id])
-}
-
-model Users {
-  id           String         @id @default(uuid())
-  full_name    String
-  email        String         @unique
-  role         String         @default("user")
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  passwordHash String
-  Expenses     Expenses[]
-  GroupMembers GroupMembers[]
-  Groups       Groups[]
-}
