@@ -5,6 +5,7 @@ import { Wallet, BarChart3, Users, Search, TrendingUp, TrendingDown, Plus, Arrow
 import { useState, useEffect } from "react";
 import { getCurrentUser, logout } from "../../lib/api";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 // Sidebar Component
 function Sidebar() {
@@ -204,6 +205,8 @@ export default function DashboardPage() {
         router.push('/login');
       } else {
         setUser(response.user);
+        // Show welcome toast
+        toast.success(`Welcome, ${response.user.full_name}!`);
       }
       setLoading(false);
     }
@@ -211,8 +214,15 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleLogout = async () => {
-    await logout();
-    router.push('/login');
+    const response = await logout();
+    if (response.error) {
+      toast.error('Logout failed. Please try again.');
+      return;
+    }
+    toast.success('Logged out successfully!');
+    setTimeout(() => {
+      router.push('/login');
+    }, 1000);
   };
 
   if (loading) {
@@ -227,7 +237,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
+    <>
+      <Toaster position="top-right" />
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
       {/* Top Bar */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -326,5 +338,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

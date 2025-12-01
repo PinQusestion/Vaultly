@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Wallet, Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/FormInput';
-import { signup, login} from '../../lib/api';
+import { signup, login } from '../../lib/api';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('');
@@ -57,15 +58,19 @@ export default function SignupPage() {
       }
 
       // Automatically log in the user after successful signup
+      toast.success('Account created successfully!');
       const loginResponse = await login(email, password);
       if (loginResponse.error) {
         setErrors({ submit: loginResponse.error });
+        toast.error(loginResponse.error);
         setLoading(false);
         return;
       }
       
-      console.log('User logged in:', loginResponse.user);
-      window.location.href = '/dashboard';
+      toast.success('Logged in! Redirecting to dashboard...');
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
     } catch (err) {
       setErrors({ submit: 'Signup failed. Please try again.' });
     } finally {
@@ -74,7 +79,9 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
+    <>
+      <Toaster position="top-right" />
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -222,5 +229,6 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

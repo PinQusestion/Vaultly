@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Wallet, Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/FormInput';
 import { login } from '../../lib/api';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -33,21 +34,27 @@ export default function LoginPage() {
       const loginResponse = await login(email, password);
       if (loginResponse.error) {
         setErrors({ submit: loginResponse.error });
+        toast.error(loginResponse.error);
         setLoading(false);
         return;
       }
+      // Show success toast
+      toast.success('Login successful! Redirecting...');
       // Redirect User to Dashboard
-      window.location.href = '/dashboard';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
     } catch (err) {
       setErrors({ submit: 'Login failed. Please try again.' });
-      setLoading(false);
-    } finally {
+      toast.error('Login failed. Please try again.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
+    <>
+      <Toaster position="top-right" />
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -128,5 +135,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
