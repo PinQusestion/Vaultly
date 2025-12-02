@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth.Routes");
 const expenseRoutes = require("./routes/expense.Routes");
 const userRoutes = require("./routes/user.Routes");
 const groupRoutes = require("./routes/group.Routes");
+const goalRoutes = require("./routes/goal.Routes");
 
 const cors = require("cors");
 
@@ -25,6 +26,7 @@ app.use("/auth", authRoutes);
 app.use("/expenses", expenseRoutes);
 app.use("/users", userRoutes);
 app.use("/groups", groupRoutes);
+app.use("/goals", goalRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

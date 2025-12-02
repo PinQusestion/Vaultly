@@ -20,6 +20,7 @@ model Users {
   Expenses     Expenses[]
   GroupMembers GroupMembers[]
   Groups       Groups[]
+  Goals        Goals[]
 }
 
 model Groups {
@@ -75,3 +76,17 @@ model GroupMembers {
   @@unique([groupId, userId])
 }
 
+model Goals {
+  id              String   @id @default(uuid())
+  userId          String
+  name            String
+  targetAmount    Float
+  currentAmount   Float    @default(0)
+  deadline        DateTime?
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  Users           Users    @relation(fields: [userId], references: [id])
+}
