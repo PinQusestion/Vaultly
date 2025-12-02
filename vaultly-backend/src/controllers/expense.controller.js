@@ -1,4 +1,4 @@
-const expenseService = require('../services/expense.Services');
+const expenseService = require('../services/expense.service');
 
 async function createExpense(req, res) {
     const { categoryId, amount, date, description, groupId = null } = req.body;

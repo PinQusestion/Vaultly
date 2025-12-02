@@ -1,4 +1,4 @@
-const goalService = require('../services/goal.Services');
+const goalService = require('../services/goal.service');
 
 async function createGoal(req, res) {
     const { name, targetAmount, deadline, description } = req.body;

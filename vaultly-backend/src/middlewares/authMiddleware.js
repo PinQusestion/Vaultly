@@ -1,6 +1,6 @@
 // responsible for authenticating requests using JWT tokens.
 
-const authService = require('../services/auth.Services');
+const authService = require('../services/auth.service');
 
 async function authenticate(req, res, next){
     try{

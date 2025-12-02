@@ -1,5 +1,5 @@
 const express = require('express');
-const groupControllers = require('../controllers/group.Controllers');
+const groupController = require("../controllers/group.controller");
 const authMiddleware = require('../middlewares/authMiddleware');
 
 const groupRouter = express.Router();
@@ -8,14 +8,14 @@ const groupRouter = express.Router();
 groupRouter.use(authMiddleware.authenticate);
 
 // Group CRUD operations
-groupRouter.post('/', groupControllers.createGroup);
-groupRouter.get('/', groupControllers.getUserGroups);
-groupRouter.get('/:groupId', groupControllers.getGroupById);
-groupRouter.put('/:groupId', groupControllers.updateGroup);
-groupRouter.delete('/:groupId', groupControllers.deleteGroup);
+groupRouter.post('/', groupController.createGroup);
+groupRouter.get('/', groupController.getUserGroups);
+groupRouter.get('/:groupId', groupController.getGroupById);
+groupRouter.put('/:groupId', groupController.updateGroup);
+groupRouter.delete('/:groupId', groupController.deleteGroup);
 
-// Group member management
-groupRouter.post('/:groupId/members', groupControllers.addGroupMember);
-groupRouter.delete('/:groupId/members/:memberId', groupControllers.removeGroupMember);
+// Group member operations
+groupRouter.post('/:groupId/members', groupController.addGroupMember);
+groupRouter.delete('/:groupId/members/:memberId', groupController.removeGroupMember);
 
 module.exports = groupRouter;
