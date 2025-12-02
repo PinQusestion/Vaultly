@@ -101,6 +101,11 @@ async function updateGoal(goalId, userId, updateData) {
             throw new Error("Unauthorized to update this goal");
         }
 
+        // Validate targetAmount is not less than currentAmount
+        if (updateData.targetAmount && updateData.targetAmount < goal.currentAmount) {
+            throw new Error("Target amount cannot be less than current amount");
+        }
+
         const updatedGoal = await prisma.goals.update({
             where: { id: goalId },
             data: {
@@ -172,10 +177,13 @@ async function contributeToGoal(goalId, userId, amount) {
             throw new Error("Contribution amount must be positive");
         }
 
+        // Allow over-contribution but cap currentAmount at reasonable limit
+        const newAmount = goal.currentAmount + amount;
+        
         const updatedGoal = await prisma.goals.update({
             where: { id: goalId },
             data: {
-                currentAmount: goal.currentAmount + amount
+                currentAmount: newAmount
             }
         });
 

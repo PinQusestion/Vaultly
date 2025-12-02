@@ -8,6 +8,7 @@ export default function UpdateGoalModal({ isOpen, onClose, goal, onGoalUpdated }
   const [targetAmount, setTargetAmount] = useState('');
   const [deadline, setDeadline] = useState('');
   const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (goal) {
@@ -21,6 +22,8 @@ export default function UpdateGoalModal({ isOpen, onClose, goal, onGoalUpdated }
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (isSubmitting) return;
+    
     if (!name.trim() || !targetAmount) {
       toast.error('Goal name and target amount are required');
       return;
@@ -31,6 +34,11 @@ export default function UpdateGoalModal({ isOpen, onClose, goal, onGoalUpdated }
       return;
     }
 
+    if (goal && parseFloat(targetAmount) < goal.currentAmount) {
+      toast.error('Target amount cannot be less than current amount ($' + goal.currentAmount.toFixed(2) + ')');
+      return;
+    }
+
     const goalData = {
       name,
       targetAmount: parseFloat(targetAmount),
@@ -38,7 +46,9 @@ export default function UpdateGoalModal({ isOpen, onClose, goal, onGoalUpdated }
       description
     };
 
+    setIsSubmitting(true);
     await onGoalUpdated(goalData);
+    setIsSubmitting(false);
     onClose();
   };
 
@@ -102,6 +112,7 @@ export default function UpdateGoalModal({ isOpen, onClose, goal, onGoalUpdated }
               <input
                 type="number"
                 step="0.01"
+                min="0.01"
                 value={targetAmount}
                 onChange={(e) => setTargetAmount(e.target.value)}
                 placeholder="0.00"
@@ -149,15 +160,17 @@ export default function UpdateGoalModal({ isOpen, onClose, goal, onGoalUpdated }
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Update Goal
+              {isSubmitting ? 'Updating...' : 'Update Goal'}
             </button>
           </div>
         </form>

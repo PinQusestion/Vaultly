@@ -5,16 +5,32 @@ import { X, DollarSign, TrendingUp } from 'lucide-react';
 
 export default function ContributeGoalModal({ isOpen, onClose, goal, onContribute }) {
   const [amount, setAmount] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
     
     if (!amount || parseFloat(amount) <= 0) {
       toast.error('Amount must be positive');
       return;
     }
 
-    await onContribute(parseFloat(amount));
+    const contributionAmount = parseFloat(amount);
+    const newTotal = goal.currentAmount + contributionAmount;
+    
+    // Warn if contribution exceeds target
+    if (newTotal > goal.targetAmount) {
+      const overage = newTotal - goal.targetAmount;
+      if (!confirm(`This will exceed your goal by $${overage.toFixed(2)}. Continue?`)) {
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+    await onContribute(contributionAmount);
+    setIsSubmitting(false);
     onClose();
     setAmount('');
   };
@@ -26,7 +42,7 @@ export default function ContributeGoalModal({ isOpen, onClose, goal, onContribut
 
   if (!isOpen || !goal) return null;
 
-  const remaining = goal.targetAmount - goal.currentAmount;
+  const remaining = Math.max(0, goal.targetAmount - goal.currentAmount);
 
   return (
     <div 
@@ -70,6 +86,7 @@ export default function ContributeGoalModal({ isOpen, onClose, goal, onContribut
               <input
                 type="number"
                 step="0.01"
+                min="0.01"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
@@ -89,15 +106,17 @@ export default function ContributeGoalModal({ isOpen, onClose, goal, onContribut
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Contribute
+              {isSubmitting ? 'Contributing...' : 'Contribute'}
             </button>
           </div>
         </form>

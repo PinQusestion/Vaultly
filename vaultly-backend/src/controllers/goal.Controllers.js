@@ -49,12 +49,18 @@ async function updateGoal(req, res) {
     const userId = req.userId;
     const updateData = req.body;
 
+    // Validate targetAmount if provided
+    if (updateData.targetAmount !== undefined && updateData.targetAmount <= 0) {
+        return res.status(400).json({ error: 'Target amount must be positive' });
+    }
+
     try {
         const goal = await goalService.updateGoal(goalId, userId, updateData);
         return res.status(200).json({ success: true, goal });
     } catch (error) {
         console.error('Update goal error:', error);
-        return res.status(500).json({ error: error.message });
+        const statusCode = error.message.includes('cannot be less than') ? 400 : 500;
+        return res.status(statusCode).json({ error: error.message });
     }
 }
 

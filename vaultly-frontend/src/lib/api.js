@@ -275,34 +275,43 @@ async function removeGroupMember(groupId, memberId) {
 
 // Goals API
 async function getUserGoals() {
-  const response = await fetch(`${API}/goals`, {
-    method: "GET",
-    credentials: "include",
-  });
+  try {
+    const response = await fetch(`${API}/goals`, {
+      method: "GET",
+      credentials: "include",
+    });
 
-  if (!response.ok) {
-    return { error: "Failed to fetch goals" };
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch goals" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
   }
-
-  return response.json();
 }
 
 async function createGoal(goalData) {
-  const response = await fetch(`${API}/goals`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(goalData),
-  });
+  try {
+    const response = await fetch(`${API}/goals`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(goalData),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    return { error: error.message || "Failed to create goal" };
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to create goal" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
   }
-
-  return response.json();
 }
 
 async function getGoalById(goalId) {
@@ -320,53 +329,65 @@ async function getGoalById(goalId) {
 }
 
 async function updateGoal(goalId, updateData) {
-  const response = await fetch(`${API}/goals/${goalId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(updateData),
-  });
+  try {
+    const response = await fetch(`${API}/goals/${goalId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(updateData),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    return { error: error.message || "Failed to update goal" };
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to update goal" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
   }
-
-  return response.json();
 }
 
 async function deleteGoal(goalId) {
-  const response = await fetch(`${API}/goals/${goalId}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+  try {
+    const response = await fetch(`${API}/goals/${goalId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    return { error: error.message || "Failed to delete goal" };
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to delete goal" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
   }
-
-  return response.json();
 }
 
 async function contributeToGoal(goalId, amount) {
-  const response = await fetch(`${API}/goals/${goalId}/contribute`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({ amount }),
-  });
+  try {
+    const response = await fetch(`${API}/goals/${goalId}/contribute`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ amount }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    return { error: error.message || "Failed to contribute to goal" };
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to contribute to goal" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
   }
-
-  return response.json();
 }
 
 export { 
