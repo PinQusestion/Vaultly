@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut } from "lucide-react";
 import { getCurrentUser, logout } from "../../lib/api";
@@ -200,7 +200,7 @@ export default function DashboardPage() {
   const [expenses, setExpenses] = useState([]);
   const router = useRouter();
 
-  useState(() => {
+  useEffect(() => {
     async function fetchUser() {
       const response = await getCurrentUser();
       if (response.error) {

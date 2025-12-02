@@ -85,20 +85,6 @@ async function createExpense(expenseData) {
   return response.json();
 }
 
-async function getExpensesbyUserId(userId) {
-  const response = await fetch(`${API}/expenses`, {
-    method: "GET",
-    credentials: "include",
-    body: JSON.stringify({ userId }),
-  });
-
-  if (!response.ok) {
-    return { error: "Failed to fetch expenses" };
-  }
-
-  return response.json();
-}
-
 async function getUserExpenses() {
   const response = await fetch(`${API}/expenses`, {
     method: "GET",
@@ -112,4 +98,4 @@ async function getUserExpenses() {
   return response.json();
 }
 
-export { login, signup, logout, getCurrentUser, createExpense, getExpensesbyUserId, getUserExpenses };
+export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses };

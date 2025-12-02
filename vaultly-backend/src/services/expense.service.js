@@ -37,7 +37,7 @@ async function getUserExpenses(userId){
             where: { userId },
             orderBy: { date: 'desc' },
             include: {
-                category: {
+                Categories: {
                     select: {
                         name: true
                     }
@@ -50,7 +50,7 @@ async function getUserExpenses(userId){
             id: expense.id,
             date: expense.date,
             description: expense.description,
-            category: expense.category.name,
+            category: expense.Categories.name,
             amount: expense.amount,
             userId: expense.userId,
             groupId: expense.groupId
