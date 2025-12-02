@@ -335,9 +335,9 @@ export default function ProfilePage() {
               <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-white bg-opacity-20 rounded-xl backdrop-blur-sm">
-                    <TrendingUp size={24} className="text-white" />
+                    <TrendingUp size={24} className="text-blue-900 stroke-[2.5]" />
                   </div>
-                  <Sparkles className="opacity-50 text-white" size={24} />
+                  <Sparkles className="opacity-50 text-blue-200" size={24} />
                 </div>
                 <p className="text-blue-100 text-sm font-medium mb-1">Financial Tracker</p>
                 <p className="text-3xl font-bold">{expenses.length}</p>
@@ -347,9 +347,9 @@ export default function ProfilePage() {
               <div className="bg-linear-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-white bg-opacity-20 rounded-xl backdrop-blur-sm">
-                    <Award size={24} className="text-white" />
+                    <Award size={24} className="text-emerald-900 stroke-[2.5]" />
                   </div>
-                  <Award className="opacity-30 text-white" size={32} />
+                  <Award className="opacity-30 text-emerald-200" size={32} />
                 </div>
                 <p className="text-emerald-100 text-sm font-medium mb-1">Loyalty Badge</p>
                 <p className="text-3xl font-bold">{accountAgeDays > 0 ? accountAgeDays : '<1'}</p>

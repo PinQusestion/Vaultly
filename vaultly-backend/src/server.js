@@ -8,6 +8,7 @@ const userRoutes = require("./routes/user.routes.js");
 const groupRoutes = require("./routes/group.routes.js");
 const goalRoutes = require("./routes/goal.routes.js");
 const analyticsRoutes = require("./routes/analytics.routes.js");
+const oauthRoutes = require("./routes/oauth.routes.js");
 
 const cors = require("cors");
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRoutes);
+app.use("/auth", oauthRoutes);
 app.use("/expenses", expenseRoutes);
 app.use("/users", userRoutes);
 app.use("/groups", groupRoutes);

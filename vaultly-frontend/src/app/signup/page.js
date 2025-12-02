@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Wallet, Eye, EyeOff } from 'lucide-react';
+import { Wallet, Eye, EyeOff, Chrome } from 'lucide-react';
 import FormInput from '../../components/FormInput';
 import { signup, login } from '../../lib/api';
 import toast, { Toaster } from 'react-hot-toast';
@@ -18,6 +18,10 @@ export default function SignupPage() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  const handleGoogleSignup = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/google`;
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -222,6 +226,28 @@ export default function SignupPage() {
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500 font-medium">Or continue with</span>
+            </div>
+          </div>
+
+          {/* OAuth Buttons */}
+          <div>
+            <button
+              type="button"
+              onClick={handleGoogleSignup}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 group"
+            >
+              <Chrome className="text-gray-600 group-hover:text-blue-600 transition-colors" size={20} />
+              Continue with Google
+            </button>
+          </div>
 
           <div className="text-center text-sm text-gray-600">
             Already have an account? <Link href="/login" className="text-blue-600 font-semibold hover:underline">Sign in</Link>

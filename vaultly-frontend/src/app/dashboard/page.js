@@ -470,52 +470,131 @@ export default function DashboardPage() {
 
             {/* Main Dashboard Content */}
             <main className="lg:col-span-3 space-y-6">
-            {/* Balance Card */}
-            <div className="bg-linear-to-r from-blue-600 to-emerald-600 rounded-xl p-8 text-white shadow-lg">
-              <div className="flex justify-between items-start mb-12">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium mb-2">Total Expenses</p>
-                  <div className="flex items-center gap-3">
-                    <p className="text-4xl font-bold">{hideBalance ? "****" : `$${stats.totalExpenses.toFixed(2)}`}</p>
-                    <button onClick={() => setHideBalance(!hideBalance)} className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition">
-                      {hideBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+            {expenses.length === 0 ? (
+              // Empty State for New Users
+              <div className="space-y-6">
+                {/* Welcome Card */}
+                <div className="bg-linear-to-r from-blue-600 to-emerald-600 rounded-xl p-8 text-white shadow-lg">
+                  <div className="text-center">
+                    <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                      <Wallet size={40} className="text-blue-900 stroke-[2.5]" />
+                    </div>
+                    <h2 className="text-3xl font-bold mb-2">Welcome to Vaultly! 🎉</h2>
+                    <p className="text-blue-100 mb-6">Start your financial journey by adding your first expense</p>
+                    <button 
+                      onClick={() => setIsModalOpen(true)}
+                      className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                    >
+                      <Plus size={20} />
+                      Add Your First Expense
                     </button>
                   </div>
                 </div>
-                <div className="space-y-2 text-right">
-                  <div className={`flex items-center gap-2 justify-end ${stats.isMonthPositive ? 'text-emerald-100' : 'text-red-100'}`}>
-                    {stats.isMonthPositive ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
-                    <span className="text-sm font-semibold">{Math.abs(stats.monthChange)}%</span>
+
+                {/* Getting Started Guide */}
+                <div className="bg-white rounded-xl p-8 shadow-lg">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Getting Started</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="text-center p-6 bg-blue-50 rounded-xl border-2 border-blue-200 hover:shadow-md transition">
+                      <div className="bg-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <Receipt size={28} className="text-white" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Track Expenses</h4>
+                      <p className="text-sm text-gray-600">Add and categorize your daily expenses to see where your money goes</p>
+                    </div>
+                    <div className="text-center p-6 bg-emerald-50 rounded-xl border-2 border-emerald-200 hover:shadow-md transition">
+                      <div className="bg-emerald-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <Users size={28} className="text-white" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Create Groups</h4>
+                      <p className="text-sm text-gray-600">Split expenses with friends and family for trips or shared costs</p>
+                    </div>
+                    <div className="text-center p-6 bg-purple-50 rounded-xl border-2 border-purple-200 hover:shadow-md transition">
+                      <div className="bg-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <Target size={28} className="text-white" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Set Goals</h4>
+                      <p className="text-sm text-gray-600">Create savings goals and track your progress towards achieving them</p>
+                    </div>
                   </div>
-                  <p className="text-blue-100 text-xs">vs last month</p>
+                </div>
+
+                {/* Quick Stats - Empty State */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-xl p-6 shadow-md text-center">
+                    <div className="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                      <BarChart3 size={24} className="text-blue-600" />
+                    </div>
+                    <p className="text-gray-500 text-sm mb-1">Total Expenses</p>
+                    <p className="text-2xl font-bold text-gray-900">$0.00</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 shadow-md text-center">
+                    <div className="bg-emerald-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                      <Receipt size={24} className="text-emerald-600" />
+                    </div>
+                    <p className="text-gray-500 text-sm mb-1">Transactions</p>
+                    <p className="text-2xl font-bold text-gray-900">0</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 shadow-md text-center">
+                    <div className="bg-purple-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                      <Target size={24} className="text-purple-600" />
+                    </div>
+                    <p className="text-gray-500 text-sm mb-1">Active Goals</p>
+                    <p className="text-2xl font-bold text-gray-900">0</p>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-blue-100 text-xs font-medium mb-1">This Month</p>
-                  <p className="text-2xl font-bold">${stats.monthTotal.toFixed(2)}</p>
+            ) : (
+              // Existing Dashboard with Data
+              <>
+                {/* Balance Card */}
+                <div className="bg-linear-to-r from-blue-600 to-emerald-600 rounded-xl p-8 text-white shadow-lg">
+                  <div className="flex justify-between items-start mb-12">
+                    <div>
+                      <p className="text-blue-100 text-sm font-medium mb-2">Total Expenses</p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-4xl font-bold">{hideBalance ? "****" : `$${stats.totalExpenses.toFixed(2)}`}</p>
+                        <button onClick={() => setHideBalance(!hideBalance)} className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition">
+                          {hideBalance ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-right">
+                      <div className={`flex items-center gap-2 justify-end ${stats.isMonthPositive ? 'text-emerald-100' : 'text-red-100'}`}>
+                        {stats.isMonthPositive ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                        <span className="text-sm font-semibold">{Math.abs(stats.monthChange)}%</span>
+                      </div>
+                      <p className="text-blue-100 text-xs">vs last month</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-blue-100 text-xs font-medium mb-1">This Month</p>
+                      <p className="text-2xl font-bold">${stats.monthTotal.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-blue-100 text-xs font-medium mb-1">This Week</p>
+                      <p className="text-2xl font-bold">${stats.weekTotal.toFixed(2)}</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-blue-100 text-xs font-medium mb-1">This Week</p>
-                  <p className="text-2xl font-bold">${stats.weekTotal.toFixed(2)}</p>
+
+                {/* KPI Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <KPICard icon={TrendingUp} label="This Month" value={`$${stats.monthTotal.toFixed(2)}`} change={Math.abs(stats.monthChange)} isPositive={stats.isMonthPositive} color="blue" />
+                  <KPICard icon={TrendingDown} label="This Week" value={`$${stats.weekTotal.toFixed(2)}`} change={Math.abs(stats.weekChange)} isPositive={stats.isWeekPositive} color="emerald" />
                 </div>
-              </div>
-            </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <KPICard icon={TrendingUp} label="This Month" value={`$${stats.monthTotal.toFixed(2)}`} change={Math.abs(stats.monthChange)} isPositive={stats.isMonthPositive} color="blue" />
-              <KPICard icon={TrendingDown} label="This Week" value={`$${stats.weekTotal.toFixed(2)}`} change={Math.abs(stats.weekChange)} isPositive={stats.isWeekPositive} color="emerald" />
-            </div>
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <SimpleChart expenses={expenses} />
+                  <CategoryBreakdown expenses={expenses} />
+                </div>
 
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SimpleChart expenses={expenses} />
-              <CategoryBreakdown expenses={expenses} />
-            </div>
-
-            {/* Recent Transactions */}
-            <RecentTransactions expenses={expenses} />
+                {/* Recent Transactions */}
+                <RecentTransactions expenses={expenses} />
+              </>
+            )}
           </main>
         </div>
       </div>
