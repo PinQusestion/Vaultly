@@ -390,6 +390,137 @@ async function contributeToGoal(goalId, amount) {
   }
 }
 
+// Analytics API
+async function getSpendingOverview(startDate, endDate) {
+  try {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    
+    const response = await fetch(`${API}/analytics/overview?${params.toString()}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch overview" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
+async function getMonthlyTrends(months = 6) {
+  try {
+    const response = await fetch(`${API}/analytics/trends?months=${months}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch trends" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
+async function getTopExpenses(limit = 10) {
+  try {
+    const response = await fetch(`${API}/analytics/top-expenses?limit=${limit}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch top expenses" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
+async function getGroupAnalytics() {
+  try {
+    const response = await fetch(`${API}/analytics/groups`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch group analytics" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
+async function getGoalsProgressAnalytics() {
+  try {
+    const response = await fetch(`${API}/analytics/goals`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch goals analytics" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
+async function getComparisonData(period = 'month') {
+  try {
+    const response = await fetch(`${API}/analytics/comparison?period=${period}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch comparison" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
+async function getDashboardStats() {
+  try {
+    const response = await fetch(`${API}/analytics/dashboard`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return { error: error.error || error.message || "Failed to fetch dashboard stats" };
+    }
+
+    return response.json();
+  } catch (error) {
+    return { error: "Network error. Please check your connection." };
+  }
+}
+
 export { 
   login, 
   signup, 
@@ -412,5 +543,12 @@ export {
   getGoalById,
   updateGoal,
   deleteGoal,
-  contributeToGoal
+  contributeToGoal,
+  getSpendingOverview,
+  getMonthlyTrends,
+  getTopExpenses,
+  getGroupAnalytics,
+  getGoalsProgressAnalytics,
+  getComparisonData,
+  getDashboardStats
 };

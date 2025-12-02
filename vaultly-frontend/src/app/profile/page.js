@@ -157,7 +157,7 @@ export default function ProfilePage() {
           {/* Profile Content */}
           <div className="relative px-8 pb-8">
             {/* Avatar */}
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-16 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-20 mb-6">
               <div className="flex items-end gap-6 mb-4 sm:mb-0">
                 <div className="relative group">
                   <div className="w-32 h-32 rounded-2xl bg-linear-to-br from-orange-400 to-pink-500 p-1 shadow-2xl">
@@ -169,13 +169,9 @@ export default function ProfilePage() {
                     <CheckCircle className="text-white" size={20} />
                   </div>
                 </div>
-                <div className="pb-2">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-1">{user?.full_name}</h1>
-                  <p className="text-gray-600 flex items-center gap-2">
-                    <Mail size={16} />
-                    {user?.email}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
+                <div className="pb-4">
+                  <h1 className="text-3xl font-bold text-white drop-shadow-lg mb-3">{user?.full_name}</h1>
+                  <div className="flex items-center gap-2">
                     <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold flex items-center gap-1">
                       <Shield size={12} />
                       Verified
@@ -191,7 +187,7 @@ export default function ProfilePage() {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-6 py-3 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:scale-105 hover:from-blue-500 hover:to-emerald-500 transition-all duration-300 flex items-center gap-2"
+                  className="px-6 py-3 bg-white text-gray-900 border-2 border-gray-200 rounded-xl font-semibold hover:shadow-xl hover:scale-105 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 flex items-center gap-2"
                 >
                   <Edit2 size={18} />
                   Edit Profile
