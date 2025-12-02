@@ -14,6 +14,7 @@ import {
   DollarSign,
   Crown,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import {
   getUserGroups,
