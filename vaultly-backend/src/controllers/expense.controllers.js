@@ -1,4 +1,4 @@
-const expenseService = require('../services/expense.service');
+const expenseService = require('../services/expense.Services');
 
 async function createExpense(req, res) {
     const { categoryId, amount, date, description, groupId = null } = req.body;
@@ -45,8 +45,27 @@ async function deleteExpense(req, res) {
     }
 }
 
+async function updateExpense(req, res){
+    const { id } = req.params;
+    const userId = req.userId;
+    const updateData = req.body;
+
+    if(!id){
+        return res.status(400).json({ error: 'Expense ID is required' });
+    }
+
+    try{
+        const updatedExpense = await expenseService.updateExpense(id, userId, updateData);
+        return res.status(200).json({ expense: updatedExpense });
+    }catch(error){
+        console.error('Update expense error:', error);
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     createExpense,
     getUserExpenses,
     deleteExpense,
+    updateExpense,
 };

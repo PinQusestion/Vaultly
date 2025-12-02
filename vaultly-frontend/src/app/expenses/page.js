@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, Plus, Edit2, Trash2, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { getUserExpenses, deleteExpense, createExpense} from '../../lib/api';
+import { getUserExpenses, deleteExpense, createExpense, } from '../../lib/api';
 import toast, { Toaster } from 'react-hot-toast';
 import AddExpenseModal from '../../components/dashboard/addExpenseModel';
+import UpdateExpenseModal from '../../components/dashboard/updateExpense';
 import Navigation from '../../components/Navigation';
 
 export default function ExpensesPage() {
@@ -25,6 +26,8 @@ export default function ExpensesPage() {
   
   // Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -89,9 +92,17 @@ export default function ExpensesPage() {
     currentPage * itemsPerPage
   );
 
-  const handleExpenseAdded = (newExpense) => {
-    // The expense is already created, just add it to the state
-    setExpenses([newExpense, ...expenses]);
+  const handleAdd = async (newExpense) => {
+    try{
+      const response = await createExpense(newExpense);
+      if(response.error){
+        toast.error('Failed to add expense');
+        return;
+      }
+      setExpenses([response.expense, ...expenses]);
+    }catch(error){
+      toast.error('Failed to add expense');
+    }
   };
 
   const handleDelete = async(id) => {
@@ -104,6 +115,15 @@ export default function ExpensesPage() {
         toast.success('Expense deleted successfully!');
       }
     }
+  };
+
+  const handleUpdate = (expense) => {
+    setSelectedExpense(expense);
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleExpenseUpdated = (updatedExpense) => {
+    setExpenses(expenses.map(exp => exp.id === updatedExpense.id ? updatedExpense : exp));
   };
 
   return (
@@ -287,7 +307,10 @@ export default function ExpensesPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                            <button 
+                              onClick={() => handleUpdate(expense)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            >
                               <Edit2 size={16} />
                             </button>
                             <button 
@@ -349,11 +372,24 @@ export default function ExpensesPage() {
       </div>
 
       {/* Add Expense Modal */}
+      {/* Add Expense Modal */}
       <AddExpenseModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onExpenseAdded={handleExpenseAdded}
+        onExpenseAdded={handleAdd}
       />
+
+      {/* Update Expense Modal */}
+      <UpdateExpenseModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedExpense(null);
+        }}
+        onExpenseUpdated={handleExpenseUpdated}
+        expense={selectedExpense}
+      />
+
     </>
   );
 }

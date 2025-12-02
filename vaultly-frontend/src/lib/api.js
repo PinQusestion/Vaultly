@@ -112,4 +112,22 @@ async function deleteExpense(expenseId) {
   return response.json();
 }
 
-export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses, deleteExpense };
+async function updateExpense(expenseId, updateData){
+  const response = await fetch(`${API}/expenses/${expenseId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(updateData),
+  });
+
+  if(!response.ok){
+    const error = await response.json();
+    return { error: error.message || "Failed to update expense" };
+  }
+
+  return response.json();
+}
+
+export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses, deleteExpense, updateExpense };
