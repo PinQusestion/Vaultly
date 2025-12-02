@@ -6,7 +6,7 @@ import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, Trendi
 import { getCurrentUser, logout, getUserExpenses } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import AddExpenseModal from "../../components/dashboard/addExpenseModel";
+import AddExpenseModal from "../../components/AddExpenseModal";
 
 // Sidebar Component
 function Sidebar({ expenses }) { //Quick Stats
@@ -424,8 +424,8 @@ export default function DashboardPage() {
               {user && (
                 <div className="flex items-center gap-3">
                   <Link href="/profile">
-                    <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-lg px-4 py-2 hover:shadow-md transition cursor-pointer">
-                      <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-full">
+                    <div className="flex items-center gap-3 bg-linear-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-lg px-4 py-2 hover:shadow-md transition cursor-pointer">
+                      <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-full">
                         <User className="text-white" size={16} />
                       </div>
                       <div className="text-left">

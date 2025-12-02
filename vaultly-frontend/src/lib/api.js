@@ -148,4 +148,131 @@ async function updateUser(userId, updateData) {
   return response.json();
 }
 
-export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses, deleteExpense, updateExpense, updateUser };
+// Group API functions
+async function getUserGroups() {
+  const response = await fetch(`${API}/groups`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    return { error: "Failed to fetch groups" };
+  }
+
+  return response.json();
+}
+
+async function createGroup(groupData) {
+  const response = await fetch(`${API}/groups`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(groupData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to create group" };
+  }
+
+  return response.json();
+}
+
+async function getGroupById(groupId) {
+  const response = await fetch(`${API}/groups/${groupId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to fetch group" };
+  }
+
+  return response.json();
+}
+
+async function updateGroup(groupId, updateData) {
+  const response = await fetch(`${API}/groups/${groupId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(updateData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to update group" };
+  }
+
+  return response.json();
+}
+
+async function deleteGroup(groupId) {
+  const response = await fetch(`${API}/groups/${groupId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to delete group" };
+  }
+
+  return response.json();
+}
+
+async function addGroupMember(groupId, memberData) {
+  const response = await fetch(`${API}/groups/${groupId}/members`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(memberData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to add member" };
+  }
+
+  return response.json();
+}
+
+async function removeGroupMember(groupId, memberId) {
+  const response = await fetch(`${API}/groups/${groupId}/members/${memberId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to remove member" };
+  }
+
+  return response.json();
+}
+
+export { 
+  login, 
+  signup, 
+  logout, 
+  getCurrentUser, 
+  createExpense, 
+  getUserExpenses, 
+  deleteExpense, 
+  updateExpense, 
+  updateUser,
+  getUserGroups,
+  createGroup,
+  getGroupById,
+  updateGroup,
+  deleteGroup,
+  addGroupMember,
+  removeGroupMember
+};

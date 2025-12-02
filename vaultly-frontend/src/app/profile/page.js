@@ -78,7 +78,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-emerald-50">
         <Navigation />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse space-y-6">
@@ -125,7 +125,7 @@ export default function ProfilePage() {
     : 'Just now';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-emerald-50">
       <Toaster position="top-right" />
       <Navigation />
       
@@ -206,7 +206,7 @@ export default function ProfilePage() {
                   <TrendingUp size={14} />
                   Total Expenses
                 </div>
-                <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                <p className="text-2xl font-bold bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
                   ${totalExpenses.toFixed(2)}
                 </p>
               </div>
@@ -264,7 +264,7 @@ export default function ProfilePage() {
                       placeholder="Enter your full name"
                     />
                   ) : (
-                    <div className="flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-blue-50 to-emerald-50 border-2 border-blue-100 rounded-xl group-hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 px-5 py-4 bg-linear-to-r from-blue-50 to-emerald-50 border-2 border-blue-100 rounded-xl group-hover:shadow-md transition-all">
                       <div className="p-2 bg-white rounded-lg shadow-sm">
                         <User className="text-blue-600" size={20} />
                       </div>
@@ -288,7 +288,7 @@ export default function ProfilePage() {
                       placeholder="Enter your email"
                     />
                   ) : (
-                    <div className="flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-100 rounded-xl group-hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 px-5 py-4 bg-linear-to-r from-purple-50 to-pink-50 border-2 border-purple-100 rounded-xl group-hover:shadow-md transition-all">
                       <div className="p-2 bg-white rounded-lg shadow-sm">
                         <Mail className="text-purple-600" size={20} />
                       </div>

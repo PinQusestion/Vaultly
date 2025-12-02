@@ -1,34 +1,37 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { updateExpense } from '../../lib/api';
+import { createExpense, getUserGroups } from '../lib/api';
 import toast from 'react-hot-toast';
-import { X, DollarSign, Tag, Calendar, FileText } from 'lucide-react';
+import { X, DollarSign, Tag, Calendar, FileText, Users } from 'lucide-react';
 
-export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, expense }) {
+export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded }) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [date, setDate] = useState('');
   const [description, setDescription] = useState('');
   const [customCategory, setCustomCategory] = useState('');
   const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState('');
 
-  // Populate form when expense prop changes
+  // Fetch user's groups when modal opens
   useEffect(() => {
-    if (expense) {
-      setAmount(expense.amount.toString());
-      setCategory(expense.category);
-      setDate(expense.date.split('T')[0]); // Format date for input
-      setDescription(expense.description || '');
-      
-      // Check if it's a custom category (not in the predefined list)
-      const predefinedCategories = ['food', 'transport', 'entertainment', 'utilities', 'shopping', 'healthcare'];
-      if (!predefinedCategories.includes(expense.category.toLowerCase())) {
-        setShowCustomCategory(true);
-        setCustomCategory(expense.category);
-        setCategory('other');
-      }
+    if (isOpen) {
+      fetchGroups();
     }
-  }, [expense]);
+  }, [isOpen]);
+
+  const fetchGroups = async () => {
+    try {
+      const data = await getUserGroups();
+
+      if (data.success) {
+        setGroups(data.groups);
+      }
+    } catch (err) {
+      console.error("Error fetching groups:", err);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,25 +46,30 @@ export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, 
       return;
     }
 
-    const response = await updateExpense(expense.id, {
+    const expenseData = {
       amount: parseFloat(amount),
       categoryId: category === 'other' ? customCategory : category,
       date,
       description
-    });
+    };
+
+    // Add groupId only if a group is selected
+    if (selectedGroup && selectedGroup !== '') {
+      expenseData.groupId = selectedGroup;
+    }
+
+    const response = await createExpense(expenseData);
 
     if (response.error) {
       toast.error(response.error);
       return;
     }
 
-    // Pass the updated expense back to parent
-    onExpenseUpdated(response.expense);
-    toast.success('Expense updated successfully!');
+    // Pass the created expense back to parent
+    onExpenseAdded(response.expense);
+    toast.success('Expense added successfully!');
     onClose();
-  };
-
-  const handleClose = () => {
+    
     // Reset form
     setAmount('');
     setCategory('');
@@ -69,7 +77,7 @@ export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, 
     setDescription('');
     setCustomCategory('');
     setShowCustomCategory(false);
-    onClose();
+    setSelectedGroup('');
   };
 
   if (!isOpen) return null;
@@ -77,7 +85,7 @@ export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, 
   return (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
-      onClick={handleClose}
+      onClick={onClose}
     >
       <div 
         className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative animate-slideUp"
@@ -85,9 +93,9 @@ export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, 
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Update Expense</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Add Expense</h2>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition"
           >
             <X size={20} className="text-gray-600" />
@@ -190,27 +198,54 @@ export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, 
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add notes about this expense..."
-                rows={3}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition resize-none text-gray-900"
+                placeholder="Add a note..."
+                rows="3"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition text-gray-900 resize-none"
               />
             </div>
           </div>
 
+          {/* Group Selection (Optional) */}
+          {groups.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Group <span className="text-gray-500">(Optional)</span>
+              </label>
+              <div className="relative">
+                <Users size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <select
+                  value={selectedGroup}
+                  onChange={(e) => setSelectedGroup(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition text-gray-900 bg-white"
+                >
+                  <option value="">Personal (No Group)</option>
+                  {groups.map((group) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name} ({group.memberCount} members)
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Select a group to share this expense
+              </p>
+            </div>
+          )}
+
           {/* Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition"
+              className="flex-1 px-4 py-2.5 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition"
             >
-              Update Expense
+              Add Expense
             </button>
           </div>
         </form>

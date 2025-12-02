@@ -5,8 +5,8 @@ import { Search, SlidersHorizontal, Plus, Edit2, Trash2, ChevronLeft } from 'luc
 import Link from 'next/link';
 import { getUserExpenses, deleteExpense, createExpense, } from '../../lib/api';
 import toast, { Toaster } from 'react-hot-toast';
-import AddExpenseModal from '../../components/dashboard/addExpenseModel';
-import UpdateExpenseModal from '../../components/dashboard/updateExpense';
+import AddExpenseModal from '../../components/AddExpenseModal';
+import UpdateExpenseModal from '../../components/UpdateExpenseModal';
 import Navigation from '../../components/Navigation';
 
 export default function ExpensesPage() {
