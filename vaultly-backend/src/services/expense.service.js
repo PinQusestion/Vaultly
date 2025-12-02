@@ -15,7 +15,7 @@ async function createExpense({ userId, amount, categoryId, date, description, gr
             });
         }
 
-        return prisma.expenses.create({
+        const expense = await prisma.expenses.create({
             data: {
                 userId,
                 amount,
@@ -23,8 +23,26 @@ async function createExpense({ userId, amount, categoryId, date, description, gr
                 date: new Date(date),
                 description,
                 groupId
+            },
+            include: {
+                Categories: {
+                    select: {
+                        name: true
+                    }
+                }
             }
         });
+
+        // Format expense to match getUserExpenses format
+        return {
+            id: expense.id,
+            date: expense.date,
+            description: expense.description,
+            category: expense.Categories.name,
+            amount: expense.amount,
+            userId: expense.userId,
+            groupId: expense.groupId
+        };
     }catch(error){
         console.error('Service error:', error);
         throw new Error("Error creating expense: " + error.message);
@@ -62,7 +80,33 @@ async function getUserExpenses(userId){
     }
 }
 
+async function deleteExpense(expenseId, userId) {
+    try {
+        // Verify the expense belongs to the user before deleting
+        const expense = await prisma.expenses.findUnique({
+            where: { id: expenseId }
+        });
+
+        if (!expense) {
+            throw new Error("Expense not found");
+        }
+
+        if (expense.userId !== userId) {
+            throw new Error("Unauthorized to delete this expense");
+        }
+
+        await prisma.expenses.delete({
+            where: { id: expenseId }
+        });
+
+        return { success: true };
+    } catch (error) {
+        throw new Error("Error deleting expense: " + error.message);
+    }
+}
+
 module.exports = {
     createExpense,
-    getUserExpenses
+    getUserExpenses,
+    deleteExpense
 };

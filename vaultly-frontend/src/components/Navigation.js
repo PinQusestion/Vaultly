@@ -55,24 +55,13 @@ export default function Navigation() {
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {!isDashboard && (
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                >
-                  <ChevronLeft size={20} />
-                  <span className="font-medium">Back to Dashboard</span>
-                </Link>
-              )}
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
-                  <Wallet className="text-white" size={24} />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">Vaultly</h1>
-                  <p className="text-xs text-gray-500">Finance Dashboard</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
+                <Wallet className="text-white" size={24} />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Vaultly</h1>
+                <p className="text-xs text-gray-500">Finance Dashboard</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -92,8 +81,7 @@ export default function Navigation() {
 
           {/* Navigation Bar - Only show on dashboard */}
           {isDashboard && (
-            <nav className="mt-4 flex gap-2 overflow-x-auto pb-2">
-              {navItems.map((item) => {
+            <nav className="mt-4 flex gap-2 overflow-x-auto pb-2">{navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
                 return (

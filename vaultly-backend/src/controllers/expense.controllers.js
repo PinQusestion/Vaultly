@@ -28,7 +28,25 @@ async function getUserExpenses(req, res) {
     }
 }
 
+async function deleteExpense(req, res) {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    if (!id) {
+        return res.status(400).json({ error: 'Expense ID is required' });
+    }
+
+    try {
+        await expenseService.deleteExpense(id, userId);
+        return res.status(200).json({ message: 'Expense deleted successfully' });
+    } catch (error) {
+        console.error('Delete expense error:', error);
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     createExpense,
     getUserExpenses,
+    deleteExpense,
 };

@@ -98,4 +98,18 @@ async function getUserExpenses() {
   return response.json();
 }
 
-export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses };
+async function deleteExpense(expenseId) {
+  const response = await fetch(`${API}/expenses/${expenseId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to delete expense" };
+  }
+
+  return response.json();
+}
+
+export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses, deleteExpense };

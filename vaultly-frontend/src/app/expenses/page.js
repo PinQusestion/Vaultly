@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, Plus, Edit2, Trash2 } from 'lucide-react';
-import { getUserExpenses } from '../../lib/api';
+import { Search, SlidersHorizontal, Plus, Edit2, Trash2, ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
+import { getUserExpenses, deleteExpense, createExpense} from '../../lib/api';
 import toast, { Toaster } from 'react-hot-toast';
 import AddExpenseModal from '../../components/dashboard/addExpenseModel';
 import Navigation from '../../components/Navigation';
@@ -46,8 +47,8 @@ export default function ExpensesPage() {
     // Search
     if (searchQuery) {
       result = result.filter(expense => 
-        expense.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        expense.category.toLowerCase().includes(searchQuery.toLowerCase())
+        expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        expense.category?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -89,14 +90,19 @@ export default function ExpensesPage() {
   );
 
   const handleExpenseAdded = (newExpense) => {
-    fetchExpenses(); // Refresh the list
-    toast.success('Expense added successfully!');
+    // The expense is already created, just add it to the state
+    setExpenses([newExpense, ...expenses]);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async(id) => {
     if (confirm('Are you sure you want to delete this expense?')) {
-      setExpenses(expenses.filter(exp => exp.id !== id));
-      toast.success('Expense deleted successfully!');
+      const response = await deleteExpense(id);
+      if (response.error) {
+        toast.error('Failed to delete expense');
+      } else {
+        setExpenses(expenses.filter(exp => exp.id !== id));
+        toast.success('Expense deleted successfully!');
+      }
     }
   };
 
@@ -106,6 +112,15 @@ export default function ExpensesPage() {
       <Toaster position="top-right" />
       <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
         <div className="max-w-7xl mx-auto">
+          {/* Back to Dashboard */}
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 px-4 py-2 mb-4 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+          >
+            <ChevronLeft size={20} />
+            <span className="font-medium">Back to Dashboard</span>
+          </Link>
+
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Expense Manager</h1>
@@ -138,7 +153,7 @@ export default function ExpensesPage() {
                 </button>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="flex-1 md:flex-none px-4 py-2.5 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center justify-center gap-2"
+                  className="flex-1 md:flex-none px-4 py-2.5 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center justify-center gap-2"
                 >
                   <Plus size={18} />
                   Add Expense
@@ -237,7 +252,7 @@ export default function ExpensesPage() {
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-blue-600 to-emerald-600 text-white">
+                <thead className="bg-linear-to-r from-blue-600 to-emerald-600 text-white">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Date</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Description</th>
@@ -311,7 +326,7 @@ export default function ExpensesPage() {
                         onClick={() => setCurrentPage(i + 1)}
                         className={`px-4 py-2 rounded-lg font-medium transition ${
                           currentPage === i + 1
-                            ? 'bg-gradient-to-r from-blue-600 to-emerald-600 text-white'
+                            ? 'bg-linear-to-r from-blue-600 to-emerald-600 text-white'
                             : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                       >

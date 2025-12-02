@@ -6,5 +6,6 @@ const authMiddleware = require("../middlewares/authMiddleware");
 // All expense routes require authentication
 expenseRouter.post("/", authMiddleware.authenticate, expenseController.createExpense);
 expenseRouter.get("/", authMiddleware.authenticate, expenseController.getUserExpenses);
+expenseRouter.delete("/:id", authMiddleware.authenticate, expenseController.deleteExpense);
 
 module.exports = expenseRouter;

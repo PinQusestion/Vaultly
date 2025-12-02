@@ -37,8 +37,9 @@ export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded }) {
       return;
     }
 
-    toast.success('Expense added successfully!');
+    // Pass the created expense back to parent
     onExpenseAdded(response.expense);
+    toast.success('Expense added successfully!');
     onClose();
     
     // Reset form

@@ -4,7 +4,7 @@ const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "10", 10);
-const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || "15m";
+const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY || "7d";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
@@ -12,11 +12,11 @@ if (!JWT_SECRET) {
 }
 
 async function hashPassword(password) {
-  return bcrypt.hash(password, SALT_ROUNDS);
+  return await bcrypt.hash(password, SALT_ROUNDS);
 }
 
 async function comparePassword(password, hash) {
-  return bcrypt.compare(password, hash);
+  return await bcrypt.compare(password, hash);
 }
 
 // Accepts a small payload { userId, role }
@@ -33,15 +33,15 @@ function verifyAccessToken(token) {
 }
 
 async function findUserByEmail(email) {
-  return prisma.users.findUnique({ where: { email } });
+  return await prisma.users.findUnique({ where: { email } });
 }
 
 async function findUserById(id) {
-  return prisma.users.findUnique({ where: { id } });
+  return await prisma.users.findUnique({ where: { id } });
 }
 
 async function createUser({ full_name, email, passwordHash, role = "user" }) {
-  return prisma.users.create({ data: { full_name, email, passwordHash, role } });
+  return await prisma.users.create({ data: { full_name, email, passwordHash, role } });
 }
 
 module.exports = {
