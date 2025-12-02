@@ -49,11 +49,82 @@ async function createExpense({ userId, amount, categoryId, date, description, gr
     }
 }
 
-async function getUserExpenses(userId){
+async function getUserExpenses(userId, options = {}){
     try{
+        const {
+            page = 1,
+            limit = 10,
+            search = '',
+            sortBy = 'date',
+            sortOrder = 'desc',
+            category = 'all',
+            startDate = '',
+            endDate = ''
+        } = options;
+
+        // Build where clause
+        const where = { userId };
+        const andConditions = [];
+
+        // Add search filter
+        if (search) {
+            andConditions.push({
+                OR: [
+                    { description: { contains: search, mode: 'insensitive' } },
+                    { Categories: { name: { contains: search, mode: 'insensitive' } } }
+                ]
+            });
+        }
+
+        // Add category filter
+        if (category !== 'all') {
+            andConditions.push({
+                Categories: { 
+                    name: { equals: category }
+                }
+            });
+        }
+
+        // Add date range filter
+        const dateFilter = {};
+        if (startDate) {
+            dateFilter.gte = new Date(startDate);
+        }
+        if (endDate) {
+            dateFilter.lte = new Date(endDate);
+        }
+        if (Object.keys(dateFilter).length > 0) {
+            andConditions.push({ date: dateFilter });
+        }
+
+        // Combine all conditions
+        if (andConditions.length > 0) {
+            where.AND = andConditions;
+        }
+
+        // Build orderBy clause
+        let orderBy = {};
+        if (sortBy === 'date') {
+            orderBy = { date: sortOrder };
+        } else if (sortBy === 'amount') {
+            orderBy = { amount: sortOrder };
+        } else if (sortBy === 'category') {
+            orderBy = { Categories: { name: sortOrder } };
+        }
+
+        // Get total count for pagination
+        const totalCount = await prisma.expenses.count({ where });
+
+        // Calculate pagination
+        const skip = (page - 1) * limit;
+        const totalPages = Math.ceil(totalCount / limit);
+
+        // Fetch paginated expenses
         const expenses = await prisma.expenses.findMany({
-            where: { userId },
-            orderBy: { date: 'desc' },
+            where,
+            orderBy,
+            skip,
+            take: limit,
             include: {
                 Categories: {
                     select: {
@@ -74,7 +145,17 @@ async function getUserExpenses(userId){
             groupId: expense.groupId
         }));
 
-        return formattedExpenses;
+        return {
+            expenses: formattedExpenses,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalCount,
+                limit,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        };
     }catch(error){
         throw new Error("Error fetching expenses: " + error.message);
     }

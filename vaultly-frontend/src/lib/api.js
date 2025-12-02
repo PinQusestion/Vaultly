@@ -85,8 +85,23 @@ async function createExpense(expenseData) {
   return response.json();
 }
 
-async function getUserExpenses() {
-  const response = await fetch(`${API}/expenses`, {
+async function getUserExpenses(params = {}) {
+  const queryParams = new URLSearchParams();
+  
+  // Add query parameters if they exist
+  if (params.page) queryParams.append('page', params.page);
+  if (params.limit) queryParams.append('limit', params.limit);
+  if (params.search) queryParams.append('search', params.search);
+  if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+  if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+  if (params.category && params.category !== 'all') queryParams.append('category', params.category);
+  if (params.startDate) queryParams.append('startDate', params.startDate);
+  if (params.endDate) queryParams.append('endDate', params.endDate);
+
+  const queryString = queryParams.toString();
+  const url = `${API}/expenses${queryString ? `?${queryString}` : ''}`;
+
+  const response = await fetch(url, {
     method: "GET",
     credentials: "include",
   });

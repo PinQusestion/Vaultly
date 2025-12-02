@@ -11,7 +11,12 @@ import Navigation from '../../components/Navigation';
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
-  const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    limit: 10
+  });
   
   // Search, Sort, Filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,65 +37,33 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [currentPage, searchQuery, sortBy, sortOrder, filterCategory, dateRange]);
 
   const fetchExpenses = async () => {
-    const response = await getUserExpenses();
+    const params = {
+      page: currentPage,
+      limit: itemsPerPage,
+      search: searchQuery,
+      sortBy,
+      sortOrder,
+      category: filterCategory,
+      startDate: dateRange.start,
+      endDate: dateRange.end
+    };
+
+    const response = await getUserExpenses(params);
     if (response.error) {
       toast.error('Failed to fetch expenses');
     } else {
       setExpenses(response.expenses || []);
+      setPagination(response.pagination || {
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0,
+        limit: itemsPerPage
+      });
     }
   };
-
-  // Apply search, sort, and filter
-  useEffect(() => {
-    let result = [...expenses];
-
-    // Search
-    if (searchQuery) {
-      result = result.filter(expense => 
-        expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        expense.category?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Filter by category
-    if (filterCategory !== 'all') {
-      result = result.filter(expense => expense.category === filterCategory);
-    }
-
-    // Filter by date range
-    if (dateRange.start) {
-      result = result.filter(expense => new Date(expense.date) >= new Date(dateRange.start));
-    }
-    if (dateRange.end) {
-      result = result.filter(expense => new Date(expense.date) <= new Date(dateRange.end));
-    }
-
-    // Sort
-    result.sort((a, b) => {
-      let comparison = 0;
-      if (sortBy === 'date') {
-        comparison = new Date(a.date) - new Date(b.date);
-      } else if (sortBy === 'amount') {
-        comparison = a.amount - b.amount;
-      } else if (sortBy === 'category') {
-        comparison = a.category.localeCompare(b.category);
-      }
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
-
-    setFilteredExpenses(result);
-    setCurrentPage(1);
-  }, [searchQuery, sortBy, sortOrder, filterCategory, dateRange, expenses]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage);
-  const paginatedExpenses = filteredExpenses.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const handleAdd = async (newExpense) => {
     try{
@@ -99,7 +72,9 @@ export default function ExpensesPage() {
         toast.error('Failed to add expense');
         return;
       }
-      setExpenses([response.expense, ...expenses]);
+      // Refetch expenses to get updated paginated data
+      await fetchExpenses();
+      toast.success('Expense added successfully!');
     }catch(error){
       toast.error('Failed to add expense');
     }
@@ -111,7 +86,7 @@ export default function ExpensesPage() {
       if (response.error) {
         toast.error('Failed to delete expense');
       } else {
-        setExpenses(expenses.filter(exp => exp.id !== id));
+        await fetchExpenses();
         toast.success('Expense deleted successfully!');
       }
     }
@@ -122,8 +97,9 @@ export default function ExpensesPage() {
     setIsUpdateModalOpen(true);
   };
 
-  const handleExpenseUpdated = (updatedExpense) => {
-    setExpenses(expenses.map(exp => exp.id === updatedExpense.id ? updatedExpense : exp));
+  const handleExpenseUpdated = async (updatedExpense) => {
+    await fetchExpenses();
+    toast.success('Expense updated successfully!');
   };
 
   return (
@@ -157,7 +133,10 @@ export default function ExpensesPage() {
                   type="text"
                   placeholder="Search expenses..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-gray-900"
                 />
               </div>
@@ -189,7 +168,10 @@ export default function ExpensesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      setCurrentPage(1);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   >
                     <option value="date">Date</option>
@@ -203,7 +185,10 @@ export default function ExpensesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Order</label>
                   <select
                     value={sortOrder}
-                    onChange={(e) => setSortOrder(e.target.value)}
+                    onChange={(e) => {
+                      setSortOrder(e.target.value);
+                      setCurrentPage(1);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   >
                     <option value="desc">Descending</option>
@@ -216,7 +201,10 @@ export default function ExpensesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select
                     value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
+                    onChange={(e) => {
+                      setFilterCategory(e.target.value);
+                      setCurrentPage(1);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   >
                     <option value="all">All Categories</option>
@@ -235,7 +223,10 @@ export default function ExpensesPage() {
                   <input
                     type="date"
                     value={dateRange.start}
-                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                    onChange={(e) => {
+                      setDateRange({ ...dateRange, start: e.target.value });
+                      setCurrentPage(1);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   />
                 </div>
@@ -245,7 +236,10 @@ export default function ExpensesPage() {
                   <input
                     type="date"
                     value={dateRange.end}
-                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                    onChange={(e) => {
+                      setDateRange({ ...dateRange, end: e.target.value });
+                      setCurrentPage(1);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   />
                 </div>
@@ -258,6 +252,7 @@ export default function ExpensesPage() {
                       setDateRange({ start: '', end: '' });
                       setSortBy('date');
                       setSortOrder('desc');
+                      setCurrentPage(1);
                     }}
                     className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
                   >
@@ -282,14 +277,14 @@ export default function ExpensesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {paginatedExpenses.length === 0 ? (
+                  {expenses.length === 0 ? (
                     <tr>
                       <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                         No expenses found. Add your first expense to get started!
                       </td>
                     </tr>
                   ) : (
-                    paginatedExpenses.map((expense) => (
+                    expenses.map((expense) => (
                       <tr key={expense.id} className="hover:bg-gray-50 transition">
                         <td className="px-6 py-4 text-sm text-gray-900">
                           {new Date(expense.date).toLocaleDateString()}
@@ -329,26 +324,26 @@ export default function ExpensesPage() {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {pagination.totalPages > 1 && (
               <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                 <div className="text-sm text-gray-600">
-                  Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredExpenses.length)} of {filteredExpenses.length} expenses
+                  Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalCount)} of {pagination.totalCount} expenses
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
+                    disabled={!pagination.hasPrevPage}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
                   <div className="flex gap-1">
-                    {[...Array(totalPages)].map((_, i) => (
+                    {[...Array(pagination.totalPages)].map((_, i) => (
                       <button
                         key={i}
                         onClick={() => setCurrentPage(i + 1)}
                         className={`px-4 py-2 rounded-lg font-medium transition ${
-                          currentPage === i + 1
+                          pagination.currentPage === i + 1
                             ? 'bg-linear-to-r from-blue-600 to-emerald-600 text-white'
                             : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
@@ -358,8 +353,8 @@ export default function ExpensesPage() {
                     ))}
                   </div>
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                    disabled={!pagination.hasNextPage}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next

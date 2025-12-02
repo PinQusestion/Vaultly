@@ -19,10 +19,29 @@ async function createExpense(req, res) {
 
 async function getUserExpenses(req, res) {
     const userId = req.userId;
+    const { 
+        page = 1, 
+        limit = 10, 
+        search = '', 
+        sortBy = 'date', 
+        sortOrder = 'desc',
+        category = 'all',
+        startDate = '',
+        endDate = ''
+    } = req.query;
 
     try{
-        const expenses = await expenseService.getUserExpenses(userId);
-        return res.status(200).json({ expenses });
+        const result = await expenseService.getUserExpenses(userId, {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            search,
+            sortBy,
+            sortOrder,
+            category,
+            startDate,
+            endDate
+        });
+        return res.status(200).json(result);
     }catch(error){
         return res.status(500).json({error: error.message});
     }

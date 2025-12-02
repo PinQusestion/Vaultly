@@ -57,7 +57,6 @@ export default function UpdateExpenseModal({ isOpen, onClose, onExpenseUpdated, 
 
     // Pass the updated expense back to parent
     onExpenseUpdated(response.expense);
-    toast.success('Expense updated successfully!');
     onClose();
   };
 

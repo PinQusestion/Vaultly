@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { createExpense, getUserGroups } from '../lib/api';
+import { getUserGroups } from '../lib/api';
 import toast from 'react-hot-toast';
 import { X, DollarSign, Tag, Calendar, FileText, Users } from 'lucide-react';
 
@@ -58,16 +58,8 @@ export default function AddExpenseModal({ isOpen, onClose, onExpenseAdded }) {
       expenseData.groupId = selectedGroup;
     }
 
-    const response = await createExpense(expenseData);
-
-    if (response.error) {
-      toast.error(response.error);
-      return;
-    }
-
-    // Pass the created expense back to parent
-    onExpenseAdded(response.expense);
-    toast.success('Expense added successfully!');
+    // Pass the expense data to parent for creation
+    await onExpenseAdded(expenseData);
     onClose();
     
     // Reset form

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut, Home, User } from "lucide-react";
-import { getCurrentUser, logout, getUserExpenses } from "../../lib/api";
+import { getCurrentUser, logout, getUserExpenses, createExpense } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import AddExpenseModal from "../../components/AddExpenseModal";
@@ -312,8 +312,8 @@ export default function DashboardPage() {
       } else {
         setUser(userResponse.user);
         
-        // Fetch expenses
-        const expensesResponse = await getUserExpenses();
+        // Fetch expenses - get all expenses for dashboard calculations
+        const expensesResponse = await getUserExpenses({ limit: 10000 });
         if (!expensesResponse.error) {
           setExpenses(expensesResponse.expenses || []);
         }
@@ -333,8 +333,18 @@ export default function DashboardPage() {
     }
   };
 
-  const handleExpenseAdded = (newExpense) => {
-    setExpenses([newExpense, ...expenses]);
+  const handleExpenseAdded = async (expenseData) => {
+    const response = await createExpense(expenseData);
+    if (response.error) {
+      toast.error('Failed to add expense');
+      return;
+    }
+    // Refetch expenses to update the dashboard
+    const expensesResponse = await getUserExpenses({ limit: 10000 });
+    if (!expensesResponse.error) {
+      setExpenses(expensesResponse.expenses || []);
+    }
+    toast.success('Expense added successfully!');
   };
 
   // Calculate statistics
