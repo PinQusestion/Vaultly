@@ -2,11 +2,11 @@ require('dotenv').config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 
-const authRoutes = require("./routes/auth.routes");
-const expenseRoutes = require("./routes/expense.routes");
-const userRoutes = require("./routes/user.routes");
-const groupRoutes = require("./routes/group.routes");
-const goalRoutes = require("./routes/goal.routes");
+const authRoutes = require("./routes/auth.routes.js");
+const expenseRoutes = require("./routes/expense.routes.js");
+const userRoutes = require("./routes/user.routes.js");
+const groupRoutes = require("./routes/group.routes.js");
+const goalRoutes = require("./routes/goal.routes.js");
 
 const cors = require("cors");
 
