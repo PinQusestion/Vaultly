@@ -3,18 +3,32 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut } from "lucide-react";
-import { getCurrentUser, logout } from "../../lib/api";
+import { getCurrentUser, logout, getUserExpenses } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import AddExpenseModal from "../../components/dashboard/addExpenseModel";
 
 // Sidebar Component
-function Sidebar() {
+function Sidebar({ expenses }) { //Quick Stats
+  // Calculate current month's total
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  
+  const monthTotal = expenses
+    .filter(exp => {
+      const expDate = new Date(exp.date);
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+    })
+    .reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+
+  const monthBudget = 3000; // You can make this dynamic later
+  const percentage = Math.min((monthTotal / monthBudget) * 100, 100);
+
   return (
     <div className="bg-white rounded-xl p-4 shadow-md sticky top-20 h-fit">
       <div className="mb-6">
         <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
+          <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
             <Wallet className="text-white" size={20} />
           </div>
           <div>
@@ -25,7 +39,7 @@ function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-2">
-        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-gradient-to-r from-blue-600 to-emerald-600 hover:shadow-md transition">
+        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-linear-to-r from-blue-600 to-emerald-600 hover:shadow-md transition">
           <BarChart3 size={18} />
           <span>Overview</span>
         </Link>
@@ -52,10 +66,10 @@ function Sidebar() {
         <div className="space-y-3 text-sm">
           <div className="flex justify-between items-center">
             <span className="text-gray-600">This Month</span>
-            <span className="font-semibold text-gray-900">$2,450</span>
+            <span className="font-semibold text-gray-900">${monthTotal.toFixed(2)}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-gradient-to-r from-blue-600 to-emerald-600 h-2 rounded-full" style={{ width: '65%' }}></div>
+            <div className="bg-linear-to-r from-blue-600 to-emerald-600 h-2 rounded-full" style={{ width: `${percentage}%` }}></div>
           </div>
         </div>
       </div>
@@ -89,18 +103,37 @@ function KPICard({ icon: Icon, label, value, change, isPositive = true, color = 
   );
 }
 
-// Chart Component (Simple placeholder bar chart)
-function SimpleChart() {
-  const data = [
-    { month: "Jan", value: 2400 },
-    { month: "Feb", value: 1398 },
-    { month: "Mar", value: 3200 },
-    { month: "Apr", value: 2780 },
-    { month: "May", value: 1890 },
-    { month: "Jun", value: 2390 },
-  ];
+// Chart Component (Spending Trend based on real data)
+function SimpleChart({ expenses }) {
+  // Get last 6 months of data
+  const getMonthlyData = () => {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const data = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const month = date.getMonth();
+      const year = date.getFullYear();
+      
+      const monthTotal = expenses
+        .filter(exp => {
+          const expDate = new Date(exp.date);
+          return expDate.getMonth() === month && expDate.getFullYear() === year;
+        })
+        .reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+      
+      data.push({
+        month: monthNames[month],
+        value: monthTotal
+      });
+    }
+    
+    return data;
+  };
 
-  const maxValue = Math.max(...data.map(d => d.value));
+  const data = getMonthlyData();
+  const maxValue = Math.max(...data.map(d => d.value), 1);
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-md">
@@ -108,11 +141,14 @@ function SimpleChart() {
       <div className="flex items-end justify-between h-64 gap-2">
         {data.map((d, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-2">
-            <div className="w-full bg-gray-200 rounded-t-lg overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-t-lg overflow-hidden relative group">
               <div
                 className="bg-linear-to-t from-blue-600 to-emerald-600 w-full transition-all duration-300 hover:opacity-80"
-                style={{ height: `${(d.value / maxValue) * 200}px` }}
+                style={{ height: `${(d.value / maxValue) * 200}px`, minHeight: d.value > 0 ? '8px' : '0px' }}
               ></div>
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                ${d.value.toFixed(2)}
+              </div>
             </div>
             <p className="text-xs text-gray-600 font-medium">{d.month}</p>
           </div>
@@ -123,14 +159,47 @@ function SimpleChart() {
 }
 
 // Category Breakdown Component
-function CategoryBreakdown() {
-  const categories = [
-    { name: "Food & Dining", amount: 480, percentage: 32, color: "bg-blue-600" },
-    { name: "Transportation", amount: 320, percentage: 21, color: "bg-emerald-600" },
-    { name: "Entertainment", amount: 240, percentage: 16, color: "bg-purple-600" },
-    { name: "Utilities", amount: 180, percentage: 12, color: "bg-amber-600" },
-    { name: "Other", amount: 280, percentage: 19, color: "bg-pink-600" },
-  ];
+function CategoryBreakdown({ expenses }) {
+  // Calculate category totals
+  const categoryTotals = expenses.reduce((acc, exp) => {
+    const category = exp.category || 'Other';
+    acc[category] = (acc[category] || 0) + parseFloat(exp.amount);
+    return acc;
+  }, {});
+
+  const totalAmount = Object.values(categoryTotals).reduce((sum, val) => sum + val, 0);
+  
+  // Convert to array and sort by amount
+  const categories = Object.entries(categoryTotals)
+    .map(([name, amount]) => ({
+      name,
+      amount,
+      percentage: totalAmount > 0 ? Math.round((amount / totalAmount) * 100) : 0,
+      color: getCategoryColor(name)
+    }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5); // Top 5 categories
+
+  function getCategoryColor(category) {
+    const colors = {
+      'food': 'bg-blue-600',
+      'transport': 'bg-emerald-600',
+      'entertainment': 'bg-purple-600',
+      'utilities': 'bg-amber-600',
+      'shopping': 'bg-pink-600',
+      'healthcare': 'bg-red-600'
+    };
+    return colors[category.toLowerCase()] || 'bg-gray-600';
+  }
+
+  if (categories.length === 0) {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-md">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Spending by Category</h3>
+        <p className="text-gray-500 text-center py-12">No expenses yet. Start adding expenses to see breakdown.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-md">
@@ -140,7 +209,7 @@ function CategoryBreakdown() {
           <div key={i}>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-gray-700">{cat.name}</span>
-              <span className="text-sm font-semibold text-gray-900">${cat.amount}</span>
+              <span className="text-sm font-semibold text-gray-900">${cat.amount.toFixed(2)}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div className={`${cat.color} h-2 rounded-full transition-all duration-300`} style={{ width: `${cat.percentage}%` }}></div>
@@ -154,36 +223,67 @@ function CategoryBreakdown() {
 }
 
 // Recent Transactions Component
-function RecentTransactions() {
-  const transactions = [
-    { id: 1, desc: "Grocery Shopping", amount: -56.20, category: "Food", icon: "🛒", date: "Today" },
-    { id: 2, desc: "Salary Deposit", amount: 3500.00, category: "Income", icon: "💰", date: "Yesterday" },
-    { id: 3, desc: "Netflix Subscription", amount: -15.99, category: "Entertainment", icon: "🎬", date: "2 days ago" },
-    { id: 4, desc: "Gas Station", amount: -45.50, category: "Transport", icon: "⛽", date: "3 days ago" },
-    { id: 5, desc: "Restaurant", amount: -84.70, category: "Food", icon: "🍽️", date: "4 days ago" },
-  ];
+function RecentTransactions({ expenses }) {
+  // Get the 5 most recent expenses
+  const recentExpenses = [...expenses]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
+
+  const getRelativeDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const diffTime = Math.abs(today - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
+
+  const getCategoryIcon = (category) => {
+    const icons = {
+      'food': '🍽️',
+      'transport': '🚗',
+      'entertainment': '🎬',
+      'utilities': '💡',
+      'shopping': '🛒',
+      'healthcare': '🏥'
+    };
+    return icons[category?.toLowerCase()] || '💰';
+  };
+
+  if (recentExpenses.length === 0) {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-md">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+          <Link href="/expenses" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</Link>
+        </div>
+        <p className="text-gray-500 text-center py-12">No transactions yet. Add your first expense!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-md">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
-        <Link href="#" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</Link>
+        <Link href="/expenses" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</Link>
       </div>
       <div className="space-y-3">
-        {transactions.map((tx) => (
-          <div key={tx.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition">
+        {recentExpenses.map((exp) => (
+          <div key={exp.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition">
             <div className="flex items-center gap-3">
-              <div className="text-2xl">{tx.icon}</div>
+              <div className="text-2xl">{getCategoryIcon(exp.category)}</div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">{tx.desc}</p>
-                <p className="text-xs text-gray-500">{tx.date}</p>
+                <p className="text-sm font-semibold text-gray-900">{exp.description || 'No description'}</p>
+                <p className="text-xs text-gray-500">{getRelativeDate(exp.date)}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className={`font-semibold text-sm ${tx.amount > 0 ? "text-emerald-600" : "text-gray-900"}`}>
-                {tx.amount > 0 ? "+" : ""}{tx.amount.toFixed(2)}
-              </p>
-              <p className="text-xs text-gray-500">{tx.category}</p>
+              <p className="font-semibold text-sm text-gray-900">-${parseFloat(exp.amount).toFixed(2)}</p>
+              <p className="text-xs text-gray-500">{exp.category}</p>
             </div>
           </div>
         ))}
@@ -201,16 +301,22 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchUser() {
-      const response = await getCurrentUser();
-      if (response.error) {
+    async function fetchData() {
+      const userResponse = await getCurrentUser();
+      if (userResponse.error) {
         router.push('/login');
       } else {
-        setUser(response.user);
+        setUser(userResponse.user);
+        
+        // Fetch expenses
+        const expensesResponse = await getUserExpenses();
+        if (!expensesResponse.error) {
+          setExpenses(expensesResponse.expenses || []);
+        }
       }
       setLoading(false);
     }
-    fetchUser();
+    fetchData();
   }, [router]);
 
   const handleLogout = async () => {
@@ -225,12 +331,63 @@ export default function DashboardPage() {
 
   const handleExpenseAdded = (newExpense) => {
     setExpenses([newExpense, ...expenses]);
-    toast.success('Expense added successfully!');
   };
+
+  // Calculate statistics
+  const calculateStats = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const lastMonth = new Date(currentYear, currentMonth - 1, 1);
+    
+    // Current month expenses
+    const currentMonthExpenses = expenses.filter(exp => {
+      const expDate = new Date(exp.date);
+      return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+    });
+    
+    // Last month expenses
+    const lastMonthExpenses = expenses.filter(exp => {
+      const expDate = new Date(exp.date);
+      return expDate.getMonth() === lastMonth.getMonth() && expDate.getFullYear() === lastMonth.getFullYear();
+    });
+    
+    // Current week (last 7 days)
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const currentWeekExpenses = expenses.filter(exp => new Date(exp.date) >= weekAgo);
+    
+    // Previous week
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const lastWeekExpenses = expenses.filter(exp => {
+      const expDate = new Date(exp.date);
+      return expDate >= twoWeeksAgo && expDate < weekAgo;
+    });
+    
+    const monthTotal = currentMonthExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const lastMonthTotal = lastMonthExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const weekTotal = currentWeekExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const lastWeekTotal = lastWeekExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    const totalExpenses = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    
+    const monthChange = lastMonthTotal > 0 ? (((monthTotal - lastMonthTotal) / lastMonthTotal) * 100).toFixed(1) : 0;
+    const weekChange = lastWeekTotal > 0 ? (((weekTotal - lastWeekTotal) / lastWeekTotal) * 100).toFixed(1) : 0;
+    
+    return {
+      monthTotal,
+      weekTotal,
+      totalExpenses,
+      monthChange,
+      weekChange,
+      isMonthPositive: monthChange < 0, // Less spending is positive
+      isWeekPositive: weekChange < 0
+    };
+  };
+
+  const stats = calculateStats();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
@@ -242,12 +399,12 @@ export default function DashboardPage() {
   return (
     <>
       <Toaster position="top-right" />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
         {/* Top Bar */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
+              <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
                 <Wallet className="text-white" size={20} />
               </div>
               <h1 className="text-xl font-bold text-gray-900">Vaultly</h1>
@@ -255,7 +412,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
+                className="px-4 py-2 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
               >
                 <Plus size={18} />
                 Add Expense
@@ -283,7 +440,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar */}
             <aside className="lg:col-span-1">
-              <Sidebar />
+              <Sidebar expenses={expenses} />
             </aside>
 
             {/* Main Dashboard Content */}
@@ -292,48 +449,48 @@ export default function DashboardPage() {
             <div className="bg-linear-to-r from-blue-600 to-emerald-600 rounded-xl p-8 text-white shadow-lg">
               <div className="flex justify-between items-start mb-12">
                 <div>
-                  <p className="text-blue-100 text-sm font-medium mb-2">Total Balance</p>
+                  <p className="text-blue-100 text-sm font-medium mb-2">Total Expenses</p>
                   <div className="flex items-center gap-3">
-                    <p className="text-4xl font-bold">{hideBalance ? "****" : "$4,256.50"}</p>
+                    <p className="text-4xl font-bold">{hideBalance ? "****" : `$${stats.totalExpenses.toFixed(2)}`}</p>
                     <button onClick={() => setHideBalance(!hideBalance)} className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition">
                       {hideBalance ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
                 </div>
                 <div className="space-y-2 text-right">
-                  <div className="flex items-center gap-2 justify-end text-emerald-100">
-                    <ArrowUpRight size={16} />
-                    <span className="text-sm font-semibold">+12.5%</span>
+                  <div className={`flex items-center gap-2 justify-end ${stats.isMonthPositive ? 'text-emerald-100' : 'text-red-100'}`}>
+                    {stats.isMonthPositive ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                    <span className="text-sm font-semibold">{Math.abs(stats.monthChange)}%</span>
                   </div>
                   <p className="text-blue-100 text-xs">vs last month</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-blue-100 text-xs font-medium mb-1">Income</p>
-                  <p className="text-2xl font-bold">$3,500</p>
+                  <p className="text-blue-100 text-xs font-medium mb-1">This Month</p>
+                  <p className="text-2xl font-bold">${stats.monthTotal.toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="text-blue-100 text-xs font-medium mb-1">Expenses</p>
-                  <p className="text-2xl font-bold">$1,243.50</p>
+                  <p className="text-blue-100 text-xs font-medium mb-1">This Week</p>
+                  <p className="text-2xl font-bold">${stats.weekTotal.toFixed(2)}</p>
                 </div>
               </div>
             </div>
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <KPICard icon={TrendingUp} label="This Month" value="$1,243.50" change="8.5" isPositive={false} color="blue" />
-              <KPICard icon={TrendingDown} label="This Week" value="$340" change="12.3" isPositive={false} color="emerald" />
+              <KPICard icon={TrendingUp} label="This Month" value={`$${stats.monthTotal.toFixed(2)}`} change={Math.abs(stats.monthChange)} isPositive={stats.isMonthPositive} color="blue" />
+              <KPICard icon={TrendingDown} label="This Week" value={`$${stats.weekTotal.toFixed(2)}`} change={Math.abs(stats.weekChange)} isPositive={stats.isWeekPositive} color="emerald" />
             </div>
 
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SimpleChart />
-              <CategoryBreakdown />
+              <SimpleChart expenses={expenses} />
+              <CategoryBreakdown expenses={expenses} />
             </div>
 
             {/* Recent Transactions */}
-            <RecentTransactions />
+            <RecentTransactions expenses={expenses} />
           </main>
         </div>
       </div>

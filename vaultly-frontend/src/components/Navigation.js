@@ -56,7 +56,7 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
+              <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
                 <Wallet className="text-white" size={24} />
               </div>
               <div>
