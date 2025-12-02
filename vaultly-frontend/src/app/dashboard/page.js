@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut } from "lucide-react";
+import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut, Home, User } from "lucide-react";
 import { getCurrentUser, logout, getUserExpenses } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -39,6 +39,10 @@ function Sidebar({ expenses }) { //Quick Stats
       </div>
 
       <nav className="flex flex-col gap-2">
+        <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+          <Home size={18} />
+          <span>Home</span>
+        </Link>
         <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-linear-to-r from-blue-600 to-emerald-600 hover:shadow-md transition">
           <BarChart3 size={18} />
           <span>Overview</span>
@@ -412,23 +416,34 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
+                className="px-4 py-2 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
               >
                 <Plus size={18} />
                 Add Expense
               </button>
               {user && (
                 <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
+                  <Link href="/profile">
+                    <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-lg px-4 py-2 hover:shadow-md transition cursor-pointer">
+                      <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-full">
+                        <User className="text-white" size={16} />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-semibold text-gray-900">{user.full_name}</p>
+                      </div>
+                    </div>
+                  </Link>
+                  <div className="relative group">
+                    <button
+                      onClick={handleLogout}
+                      className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
+                    >
+                      <LogOut size={20} />
+                    </button>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 delay-500 pointer-events-none">
+                      Logout
+                    </div>
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
-                  >
-                    <LogOut size={20} />
-                  </button>
                 </div>
               )}
             </div>

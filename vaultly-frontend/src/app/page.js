@@ -1,16 +1,45 @@
 'use client';
 
 import Link from "next/link";
-import { TrendingUp, Users, Wallet, Search, Filter, BarChart3 } from "lucide-react";
+import { TrendingUp, Users, Wallet, Search, Filter, BarChart3, LogOut, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getCurrentUser, logout } from "../lib/api";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 import Card from "../components/home/Card";
 import AnimatedStat from "../components/home/AnimatedStat";
 import HeroSection from "../components/home/HeroSection";
 import SectionAnimator from "../components/SectionAnimator";
 
 export default function Home() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkAuth() {
+      const response = await getCurrentUser();
+      if (!response.error) {
+        setUser(response.user);
+      }
+      setLoading(false);
+    }
+    checkAuth();
+  }, []);
+
+  const handleLogout = async () => {
+    const response = await logout();
+    if (response.error) {
+      toast.error('Logout failed');
+    } else {
+      setUser(null);
+      toast.success('Logged out successfully');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
-      {/* <PageLoadingOverlay /> */}
+      <Toaster position="top-right" />
       {/* Navigation Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -20,13 +49,39 @@ export default function Home() {
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Vaultly</h1>
           </div>
-          <nav className="flex gap-6 items-center">
-            <Link href="/login" className="text-gray-600 hover:text-blue-600 font-medium transition duration-300">
-              Login
-            </Link>
-            <Link href="/dashboard" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
-              Dashboard
-            </Link>
+          <nav className="flex gap-4 items-center">
+            {loading ? (
+              <div className="animate-pulse flex gap-2">
+                <div className="h-10 w-20 bg-gray-200 rounded"></div>
+                <div className="h-10 w-24 bg-gray-200 rounded"></div>
+              </div>
+            ) : user ? (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                  <User className="text-gray-600" size={18} />
+                  <span className="text-sm font-medium text-gray-900">{user.full_name}</span>
+                </div>
+                <Link href="/dashboard" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-gray-600 hover:text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition font-medium"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-gray-600 hover:text-blue-600 font-medium transition duration-300">
+                  Login
+                </Link>
+                <Link href="/signup" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>

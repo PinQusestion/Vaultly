@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wallet, BarChart3, Users, Receipt, FileText, Target, LogOut, ChevronLeft } from "lucide-react";
+import { Wallet, BarChart3, Users, Receipt, FileText, Target, LogOut, ChevronLeft, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getCurrentUser, logout } from "../lib/api";
 import { useRouter } from "next/navigation";
@@ -65,6 +65,14 @@ export default function Navigation() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition"
+                title="Home"
+              >
+                <Home size={18} />
+                <span className="font-medium hidden sm:inline">Home</span>
+              </Link>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500">{user?.email}</p>

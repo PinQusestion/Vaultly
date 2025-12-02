@@ -130,4 +130,22 @@ async function updateExpense(expenseId, updateData){
   return response.json();
 }
 
-export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses, deleteExpense, updateExpense };
+async function updateUser(userId, updateData) {
+  const response = await fetch(`${API}/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(updateData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    return { error: error.message || "Failed to update profile" };
+  }
+
+  return response.json();
+}
+
+export { login, signup, logout, getCurrentUser, createExpense, getUserExpenses, deleteExpense, updateExpense, updateUser };
