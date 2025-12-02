@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, Plus, Edit2, Trash2, ChevronLeft } from 'lucide-react';
+import { Search, SlidersHorizontal, Plus, Edit2, Trash2, ChevronLeft, Download, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { getUserExpenses, deleteExpense, createExpense, } from '../../lib/api';
 import toast, { Toaster } from 'react-hot-toast';
@@ -102,6 +102,74 @@ export default function ExpensesPage() {
     toast.success('Expense updated successfully!');
   };
 
+  // Export to CSV
+  const exportToCSV = () => {
+    if (expenses.length === 0) {
+      toast.error('No expenses to export');
+      return;
+    }
+
+    const headers = ['Date', 'Description', 'Category', 'Amount'];
+    const rows = expenses.map(exp => [
+      new Date(exp.date).toLocaleDateString(),
+      exp.description,
+      exp.category,
+      `$${parseFloat(exp.amount).toFixed(2)}`
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `expenses_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Expenses exported to CSV!');
+  };
+
+  // Export to PDF (simple text-based PDF)
+  const exportToPDF = () => {
+    if (expenses.length === 0) {
+      toast.error('No expenses to export');
+      return;
+    }
+
+    const totalAmount = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+    
+    let pdfContent = `EXPENSE REPORT\n`;
+    pdfContent += `Generated: ${new Date().toLocaleDateString()}\n`;
+    pdfContent += `Total Expenses: $${totalAmount.toFixed(2)}\n`;
+    pdfContent += `Number of Transactions: ${expenses.length}\n\n`;
+    pdfContent += `${'='.repeat(80)}\n\n`;
+    
+    expenses.forEach((exp, index) => {
+      pdfContent += `${index + 1}. ${new Date(exp.date).toLocaleDateString()}\n`;
+      pdfContent += `   Description: ${exp.description}\n`;
+      pdfContent += `   Category: ${exp.category}\n`;
+      pdfContent += `   Amount: $${parseFloat(exp.amount).toFixed(2)}\n\n`;
+    });
+
+    const blob = new Blob([pdfContent], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `expense_report_${new Date().toISOString().split('T')[0]}.txt`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Report exported!');
+  };
+
   return (
     <>
       <Navigation />
@@ -143,6 +211,22 @@ export default function ExpensesPage() {
 
               {/* Actions */}
               <div className="flex gap-3 w-full md:w-auto">
+                <button
+                  onClick={exportToCSV}
+                  className="flex-1 md:flex-none px-4 py-2.5 border border-emerald-600 text-emerald-600 rounded-lg font-medium hover:bg-emerald-50 transition flex items-center justify-center gap-2"
+                  title="Export to CSV"
+                >
+                  <Download size={18} />
+                  <span className="hidden sm:inline">CSV</span>
+                </button>
+                <button
+                  onClick={exportToPDF}
+                  className="flex-1 md:flex-none px-4 py-2.5 border border-purple-600 text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition flex items-center justify-center gap-2"
+                  title="Export Report"
+                >
+                  <FileText size={18} />
+                  <span className="hidden sm:inline">Report</span>
+                </button>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className="flex-1 md:flex-none px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2"

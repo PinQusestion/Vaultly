@@ -19,7 +19,8 @@ import {
   BarChart3,
   Target,
   Users,
-  Download
+  Download,
+  FileText
 } from 'lucide-react';
 
 export default function ReportsPage() {
@@ -122,6 +123,104 @@ export default function ReportsPage() {
     return colors[index % colors.length];
   };
 
+  // Export analytics to CSV
+  const exportAnalyticsToCSV = () => {
+    if (!overview) {
+      toast.error('No data to export');
+      return;
+    }
+
+    let csvContent = 'ANALYTICS SUMMARY\n\n';
+    csvContent += 'Category,Amount,Percentage\n';
+    
+    if (overview.categoryBreakdown && overview.categoryBreakdown.length > 0) {
+      overview.categoryBreakdown.forEach(cat => {
+        const amount = cat.total || cat.amount || cat._sum?.amount || 0;
+        const percentage = cat.percentage || 0;
+        csvContent += `"${cat.category}","$${parseFloat(amount).toFixed(2)}","${percentage}%"\n`;
+      });
+    }
+
+    csvContent += '\nMONTHLY TRENDS\n';
+    csvContent += 'Month,Amount\n';
+    if (trends && trends.length > 0) {
+      trends.forEach(t => {
+        const amount = t.total || t.amount || t._sum?.amount || 0;
+        csvContent += `"${t.month}","$${parseFloat(amount).toFixed(2)}"\n`;
+      });
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `analytics_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Analytics exported to CSV!');
+  };
+
+  // Export full report
+  const exportFullReport = () => {
+    if (!overview) {
+      toast.error('No data to export');
+      return;
+    }
+
+    let report = `FINANCIAL ANALYTICS REPORT\n`;
+    report += `Generated: ${new Date().toLocaleString()}\n`;
+    report += `Time Period: ${timeRange}\n`;
+    report += `${'='.repeat(80)}\n\n`;
+    
+    report += `SPENDING OVERVIEW\n`;
+    report += `Total Expenses: $${overview.totalExpenses?.toFixed(2) || '0.00'}\n`;
+    report += `Average per Transaction: $${overview.averageExpense?.toFixed(2) || '0.00'}\n`;
+    report += `Total Transactions: ${overview.totalTransactions || 0}\n\n`;
+    
+    if (overview.categoryBreakdown?.length > 0) {
+      report += `CATEGORY BREAKDOWN\n`;
+      report += `${'─'.repeat(80)}\n`;
+      overview.categoryBreakdown.forEach((cat, i) => {
+        const amount = cat.total || cat.amount || cat._sum?.amount || 0;
+        const percentage = cat.percentage || 0;
+        report += `${i + 1}. ${cat.category}\n`;
+        report += `   Amount: $${parseFloat(amount).toFixed(2)} (${percentage}%)\n\n`;
+      });
+    }
+
+    if (trends && trends.length > 0) {
+      report += `\nMONTHLY TRENDS (Last 6 Months)\n`;
+      report += `${'─'.repeat(80)}\n`;
+      trends.forEach(t => {
+        const amount = t.total || t.amount || t._sum?.amount || 0;
+        report += `${t.month}: $${parseFloat(amount).toFixed(2)}\n`;
+      });
+    }
+
+    if (topExpenses && topExpenses.length > 0) {
+      report += `\nTOP EXPENSES\n`;
+      report += `${'─'.repeat(80)}\n`;
+      topExpenses.forEach((exp, i) => {
+        report += `${i + 1}. ${exp.description} - $${parseFloat(exp.amount).toFixed(2)} (${exp.category})\n`;
+      });
+    }
+
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `financial_report_${new Date().toISOString().split('T')[0]}.txt`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Full report exported!');
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-emerald-50">
       <Navigation userName={userName} />
@@ -129,10 +228,30 @@ export default function ReportsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with animation */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-            Reports & Analytics
-          </h1>
-          <p className="text-gray-600 text-lg">Visualize your spending patterns and financial insights</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent mb-2">
+                Reports & Analytics
+              </h1>
+              <p className="text-gray-600 text-lg">Visualize your spending patterns and financial insights</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={exportAnalyticsToCSV}
+                className="px-4 py-2.5 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition flex items-center gap-2 shadow-md hover:shadow-lg"
+              >
+                <Download size={18} />
+                Export CSV
+              </button>
+              <button
+                onClick={exportFullReport}
+                className="px-4 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition flex items-center gap-2 shadow-md hover:shadow-lg"
+              >
+                <FileText size={18} />
+                Full Report
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Time Range Selector with animation */}
