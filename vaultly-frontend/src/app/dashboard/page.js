@@ -1,21 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Wallet, BarChart3, Users, Search, TrendingUp, TrendingDown, Plus, ArrowUpRight, ArrowDownLeft, Eye, EyeOff, LogOut, User } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut } from "lucide-react";
 import { getCurrentUser, logout } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import AddExpenseModal from "../../components/dashboard/addExpenseModel";
 
 // Sidebar Component
 function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-
   return (
     <div className="bg-white rounded-xl p-4 shadow-md sticky top-20 h-fit">
       <div className="mb-6">
         <div className="flex items-center gap-3">
-          <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
+          <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-md">
             <Wallet className="text-white" size={20} />
           </div>
           <div>
@@ -26,26 +25,27 @@ function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-2">
-        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-linear-to-r from-blue-600 to-emerald-600 hover:shadow-md transition">
+        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-gradient-to-r from-blue-600 to-emerald-600 hover:shadow-md transition">
           <BarChart3 size={18} />
           <span>Overview</span>
         </Link>
-        <Link href="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+        <Link href="/expenses" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+          <Receipt size={18} />
+          <span>Expenses</span>
+        </Link>
+        <Link href="/groups" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
           <Users size={18} />
           <span>Groups</span>
         </Link>
-        <Link href="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-          <Search size={18} />
-          <span>Transactions</span>
+        <Link href="/goals" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+          <Target size={18} />
+          <span>Goals</span>
+        </Link>
+        <Link href="/reports" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+          <FileText size={18} />
+          <span>Reports</span>
         </Link>
       </nav>
-
-      <div className="border-t border-gray-200 mt-6 pt-6">
-        <p className="text-xs text-gray-500 font-medium mb-3">Account</p>
-        <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition text-sm">
-          ← Back to Home
-        </Link>
-      </div>
 
       <div className="border-t border-gray-200 mt-6 pt-6">
         <p className="text-xs text-gray-500 font-medium mb-3">Quick Stats</p>
@@ -55,7 +55,7 @@ function Sidebar() {
             <span className="font-semibold text-gray-900">$2,450</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-linear-to-r from-blue-600 to-emerald-600 h-2 rounded-full" style={{ width: '65%' }}></div>
+            <div className="bg-gradient-to-r from-blue-600 to-emerald-600 h-2 rounded-full" style={{ width: '65%' }}></div>
           </div>
         </div>
       </div>
@@ -193,20 +193,20 @@ function RecentTransactions() {
 }
 
 export default function DashboardPage() {
-  const [hideBalance, setHideBalance] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hideBalance, setHideBalance] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expenses, setExpenses] = useState([]);
   const router = useRouter();
 
-  useEffect(() => {
+  useState(() => {
     async function fetchUser() {
       const response = await getCurrentUser();
       if (response.error) {
         router.push('/login');
       } else {
         setUser(response.user);
-        // Show welcome toast
-        toast.success(`Welcome, ${response.user.full_name}!`);
       }
       setLoading(false);
     }
@@ -216,13 +216,16 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     const response = await logout();
     if (response.error) {
-      toast.error('Logout failed. Please try again.');
-      return;
+      toast.error('Logout failed');
+    } else {
+      toast.success('Logged out successfully');
+      setTimeout(() => router.push('/login'), 1000);
     }
-    toast.success('Logged out successfully!');
-    setTimeout(() => {
-      router.push('/login');
-    }, 1000);
+  };
+
+  const handleExpenseAdded = (newExpense) => {
+    setExpenses([newExpense, ...expenses]);
+    toast.success('Expense added successfully!');
   };
 
   if (loading) {
@@ -239,55 +242,52 @@ export default function DashboardPage() {
   return (
     <>
       <Toaster position="top-right" />
-      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
-      {/* Top Bar */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-              <div className="bg-linear-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        {/* Top Bar */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-blue-600 to-emerald-600 p-2 rounded-lg">
                 <Wallet className="text-white" size={20} />
               </div>
               <h1 className="text-xl font-bold text-gray-900">Vaultly</h1>
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <Search size={20} className="text-gray-600" />
-            </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2">
-              <Plus size={18} />
-              Add Expense
-            </button>
-            {user && (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                  <User size={16} className="text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">{user.full_name}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
+              >
+                <Plus size={18} />
+                Add Expense
+              </button>
+              {user && (
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
+                  >
+                    <LogOut size={20} />
+                  </button>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition flex items-center gap-2"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <aside className="lg:col-span-1">
-            <Sidebar />
-          </aside>
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <aside className="lg:col-span-1">
+              <Sidebar />
+            </aside>
 
-          {/* Main Dashboard */}
-          <main className="lg:col-span-3 space-y-6">
+            {/* Main Dashboard Content */}
+            <main className="lg:col-span-3 space-y-6">
             {/* Balance Card */}
             <div className="bg-linear-to-r from-blue-600 to-emerald-600 rounded-xl p-8 text-white shadow-lg">
               <div className="flex justify-between items-start mb-12">
@@ -338,6 +338,13 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    
+      {/* Add Expense Modal */}
+      <AddExpenseModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onExpenseAdded={handleExpenseAdded}
+      />
     </>
   );
 }
