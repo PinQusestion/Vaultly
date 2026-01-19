@@ -22,6 +22,10 @@ export default function Home() {
       if (!response.error) {
         setUser(response.user);
       }
+      // redirect to dashboard if user is logged in
+      if (response.user) {
+        router.push('/dashboard');
+      }
       setLoading(false);
     }
     checkAuth();
