@@ -24,6 +24,11 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Health check endpoint for wake-up calls
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", message: "Server is awake" });
+});
+
 app.use("/auth", authRoutes);
 app.use("/auth", oauthRoutes);
 app.use("/expenses", expenseRoutes);

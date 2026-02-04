@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { TrendingUp, Users, Wallet, Search, Filter, BarChart3, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getCurrentUser, logout } from "../lib/api";
+import { getCurrentUser, logout, wakeUpServer } from "../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Card from "../components/home/Card";
@@ -17,6 +17,9 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
+    // Wake up the server on page load
+    wakeUpServer();
+    
     async function checkAuth() {
       const response = await getCurrentUser();
       if (!response.error) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut, Home, User } from "lucide-react";
+import { Wallet, BarChart3, Users, Receipt, FileText, Target, TrendingUp, TrendingDown, Plus, ArrowUpRight, Eye, EyeOff, LogOut, User, UtensilsCrossed, Car, Clapperboard, Lightbulb, ShoppingCart, Stethoscope, DollarSign } from "lucide-react";
 import { getCurrentUser, logout, getUserExpenses, createExpense } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
@@ -32,17 +32,13 @@ function Sidebar({ expenses }) { //Quick Stats
             <Wallet className="text-white" size={20} />
           </div>
           <div>
-            <h4 className="text-lg font-semibold">Vaultly</h4>
+            <h4 className="text-lg text-black font-semibold">Vaultly</h4>
             <p className="text-xs text-gray-500">Finance Dashboard</p>
           </div>
         </div>
       </div>
 
       <nav className="flex flex-col gap-2">
-        <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-          <Home size={18} />
-          <span>Home</span>
-        </Link>
         <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-linear-to-r from-blue-600 to-emerald-600 hover:shadow-md transition">
           <BarChart3 size={18} />
           <span>Overview</span>
@@ -247,14 +243,14 @@ function RecentTransactions({ expenses }) {
 
   const getCategoryIcon = (category) => {
     const icons = {
-      'food': '🍽️',
-      'transport': '🚗',
-      'entertainment': '🎬',
-      'utilities': '💡',
-      'shopping': '🛒',
-      'healthcare': '🏥'
+      'food': <UtensilsCrossed size={20} className="text-orange-500" />,
+      'transport': <Car size={20} className="text-blue-500" />,
+      'entertainment': <Clapperboard size={20} className="text-purple-500" />,
+      'utilities': <Lightbulb size={20} className="text-yellow-500" />,
+      'shopping': <ShoppingCart size={20} className="text-pink-500" />,
+      'healthcare': <Stethoscope size={20} className="text-red-500" />
     };
-    return icons[category?.toLowerCase()] || '💰';
+    return icons[category?.toLowerCase()] || <DollarSign size={20} className="text-green-500" />;
   };
 
   if (recentExpenses.length === 0) {
@@ -279,7 +275,7 @@ function RecentTransactions({ expenses }) {
         {recentExpenses.map((exp) => (
           <div key={exp.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition">
             <div className="flex items-center gap-3">
-              <div className="text-2xl">{getCategoryIcon(exp.category)}</div>
+              <div className="flex items-center justify-center">{getCategoryIcon(exp.category)}</div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{exp.description || 'No description'}</p>
                 <p className="text-xs text-gray-500">{getRelativeDate(exp.date)}</p>

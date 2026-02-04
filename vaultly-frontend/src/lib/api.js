@@ -1,5 +1,17 @@
 const API = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
+// Wake up the server (for Render free tier or similar services)
+async function wakeUpServer() {
+  try {
+    await fetch(`${API}/health`, {
+      method: "GET",
+    });
+  } catch (error) {
+    // Silently fail - this is just a wake-up call
+    console.log('Server wake-up call sent');
+  }
+}
+
 async function login(email, password) {
   const response = await fetch(`${API}/auth/login`, {
     method: "POST",
@@ -550,5 +562,6 @@ export {
   getGroupAnalytics,
   getGoalsProgressAnalytics,
   getComparisonData,
-  getDashboardStats
+  getDashboardStats,
+  wakeUpServer
 };

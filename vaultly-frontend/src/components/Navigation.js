@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Wallet, BarChart3, Home, LogOut } from "lucide-react";
+import { Wallet, BarChart3, Receipt, Users, Target, FileText, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getCurrentUser, logout } from "../lib/api";
 import { useRouter } from "next/navigation";
@@ -62,16 +62,46 @@ export default function Navigation() {
                 <span className="font-medium hidden sm:inline">Dashboard</span>
               </Link>
               <Link
-                href="/"
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition"
-                title="Home"
+                href="/expenses"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition"
+                title="Expenses"
               >
-                <Home size={18} />
-                <span className="font-medium hidden sm:inline">Home</span>
+                <Receipt size={18} />
+                <span className="font-medium hidden sm:inline">Expenses</span>
               </Link>
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-              </div>
+              <Link
+                href="/groups"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition"
+                title="Groups"
+              >
+                <Users size={18} />
+                <span className="font-medium hidden sm:inline">Groups</span>
+              </Link>
+              <Link
+                href="/goals"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition"
+                title="Goals"
+              >
+                <Target size={18} />
+                <span className="font-medium hidden sm:inline">Goals</span>
+              </Link>
+              <Link
+                href="/reports"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition"
+                title="Reports"
+              >
+                <FileText size={18} />
+                <span className="font-medium hidden sm:inline">Reports</span>
+              </Link>
+              <div className="border-l border-gray-300 h-8 mx-2"></div>
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition"
+                title="Profile"
+              >
+                <User size={18} />
+                <span className="font-medium hidden sm:inline">{user?.fullName || user?.name}</span>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
